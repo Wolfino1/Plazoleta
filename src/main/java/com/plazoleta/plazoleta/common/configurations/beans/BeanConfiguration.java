@@ -50,10 +50,12 @@ public class BeanConfiguration {
     public RestaurantPersistencePort restaurantPersistencePort() {
         return new RestaurantPersistenceAdapter(restaurantRepository, restaurantEntityMapper);
     }
+
     @Bean
     public DishServicePort dishServicePort(){
         return new DishUseCase(dishPersistencePort());
     }
+
     @Bean
     public DishPersistencePort dishPersistencePort(){
         return new DishPersistenceAdapter(dishRepository, dishEntityMapper);

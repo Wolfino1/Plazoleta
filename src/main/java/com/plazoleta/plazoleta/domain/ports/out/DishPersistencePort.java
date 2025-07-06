@@ -4,4 +4,6 @@ import com.plazoleta.plazoleta.domain.models.DishModel;
 
 public interface DishPersistencePort {
     void save (DishModel dishModel);
+    void update(Long id, DishModel dishModel);
+
 }

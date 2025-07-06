@@ -22,4 +22,17 @@ public class DishPersistenceAdapter implements DishPersistencePort {
         DishEntity dishEntity = dishEntityMapper.modelToEntity(dishModel);
         dishRepository.save(dishEntity);
     }
+
+    @Override
+    public void update(Long id, DishModel dishModel) {
+        DishEntity existingDish = dishRepository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Dish not found with id " + id)
+                );
+        // Solo actualizamos precio y descripción
+        existingDish.setPrice(dishModel.getPrice());
+        existingDish.setDescription(dishModel.getDescription());
+        // Persistimos los cambios
+        dishRepository.save(existingDish);
+    }
 }
