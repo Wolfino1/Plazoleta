@@ -5,8 +5,17 @@ public class DomainConstants {
     public static final String MAX_SIZE_EXCEEDED_PHONE_NUMBER = "Phone number can only contain 13 characters";
     public static final String WRONG_ARGUMENT_PHONE_MESSAGE = "phone number must begin with "+" followed by 12 numbers";
     public static final String WRONG_ARGUMENT_NAME = "Name can't only contain numbers";
-    public static final String EMPTY_MESSAGE = "This field can't be empty";
-    public static final String NULL_MESSAGE = "This field can't be null";
+    public static final String NAME_EMPTY_MESSAGE = "Name field can't be empty";
+    public static final String NAME_NULL_MESSAGE = "Name field can't be null";
+    public static final String NIT_EMPTY_MESSAGE = "NIT field can't be empty";
+    public static final String NIT_NULL_MESSAGE = "NIT field can't be null";
+    public static final String ADDRESS_EMPTY_MESSAGE = "Address field can't be empty";
+    public static final String ADDRESS_NULL_MESSAGE = "Address field can't be null";
+    public static final String PHONENUMBER_EMPTY_MESSAGE = "PhoneNumber field can't be empty";
+    public static final String PHONENUMBER_NULL_MESSAGE = "PhoneNumber field can't be null";
+    public static final String LOGOURL_EMPTY_MESSAGE = "LogoUrl field can't be empty";
+    public static final String LOGOURL_NULL_MESSAGE = "LogoUrl field can't be null";
+    public static final String OWNERID_NULL_MESSAGE = "OwnerId field can't be null";
     public static final String WRONG_OWNER_ID = "Owner ID must be a positive number";
 
 

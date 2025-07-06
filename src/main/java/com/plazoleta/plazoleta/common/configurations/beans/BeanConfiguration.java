@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -48,30 +49,33 @@ public class BeanConfiguration {
         return new JwtAuthenticationFilter(jwtUtil);
     }
 
-    @Bean
+    /* @Bean
     @Order(1)
     public SecurityFilterChain publicApiChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/api/v1/restaurant/")
+                .securityMatcher(
+                )
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth ->
                         auth.anyRequest().permitAll()
                 );
         return http.build();
-    }
+    } */
 
     @Bean
-    @Order(2)
+    //@Order(2)
     public SecurityFilterChain protectedApiChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/v1/**")
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/v1/restaurant/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(),
+                        UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

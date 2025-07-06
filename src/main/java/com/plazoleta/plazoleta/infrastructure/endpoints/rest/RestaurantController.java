@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class RestaurantController {
     private final RestaurantService restaurantService;
 
-   // @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/")
     @Operation(summary = "Create restaurant", description = "This method saves a restaurant", tags =
             {"Restaurant"}, requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description =

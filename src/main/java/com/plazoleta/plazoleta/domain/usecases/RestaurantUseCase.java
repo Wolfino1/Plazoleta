@@ -13,7 +13,6 @@ public class RestaurantUseCase implements RestaurantServicePort {
 
     @Override
     public void save(RestaurantModel restaurantModel) {
-
         restaurantPersistencePort.save(restaurantModel);
     }
 }
