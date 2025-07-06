@@ -1,0 +1,28 @@
+server:
+  port: 8090
+
+spring:
+  http:
+    encoding:
+      force: true
+      charset: UTF-8
+  security:
+    password:
+      encoder: bcrypt
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+  application:
+    name: demo
+  datasource:
+    url: jdbc:mysql://localhost/plazoleta_de_comidas
+    username: ${user}
+    password: ${password}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secret: pPj7W5c8LsyP9+ldOwqQF/qEyzTV6WUJFSUgfsVOkXs=
+  expiration: 3600000
