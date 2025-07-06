@@ -17,6 +17,13 @@ public class DomainConstants {
     public static final String LOGOURL_NULL_MESSAGE = "LogoUrl field can't be null";
     public static final String OWNERID_NULL_MESSAGE = "OwnerId field can't be null";
     public static final String WRONG_OWNER_ID = "Owner ID must be a positive number";
+    public static final String WRONG_ARGUMENT_PRICE = "Price must be a positive integer greater than 0.";
+    public static final String WRONG_ARGUMENT_DESCRIPTION = "Description can't be null or empty";
+    public static final String WRONG_ARGUMENT_URLIMAGE = "URL image can't be null or empty";
+    public static final String WRONG_ARGUMENT_CATEGORY = "Category can't be null or empty";
+    public static final String WRONG_ARGUMENT_RESTAURANT = "Restaurant can't be null or empty";
+
+
 
 
 }
