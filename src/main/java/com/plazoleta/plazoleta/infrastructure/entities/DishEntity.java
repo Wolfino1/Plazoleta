@@ -20,5 +20,5 @@ public class DishEntity {
     String urlImagen;
     String category;
     Long restaurantId;
-    boolean isActive = true;
+    boolean active = true;
 }

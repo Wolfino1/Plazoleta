@@ -12,7 +12,7 @@ public class DishModel {
     String urlImagen;
     String category;
     Long restaurantId;
-    boolean isActive = true;
+    boolean active = true;
 
     public DishModel(String name, Integer price, String description, String urlImagen, String category,
                      Long restaurantId) {
@@ -22,6 +22,9 @@ public class DishModel {
         this.urlImagen = urlImagen;
         this.category = category;
         this.restaurantId = restaurantId;
+    }
+
+    public DishModel() {
     }
 
     public String getName() {
@@ -78,11 +81,11 @@ public class DishModel {
         this.category = category;
     }
 
-    public Long getRestaurant() {
+    public Long getRestaurantId() {
         return restaurantId;
     }
 
-    public void setRestaurant(Long restaurantId) {
+    public void setRestaurantId(Long restaurantId) {
         if (restaurantId == null) {
             throw new IllegalArgumentException(DomainConstants.WRONG_ARGUMENT_RESTAURANT);
         }
@@ -90,10 +93,10 @@ public class DishModel {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
     }
 }

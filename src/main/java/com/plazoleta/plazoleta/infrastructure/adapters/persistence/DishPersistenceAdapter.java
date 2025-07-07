@@ -2,9 +2,11 @@ package com.plazoleta.plazoleta.infrastructure.adapters.persistence;
 
 import com.plazoleta.plazoleta.domain.models.DishModel;
 import com.plazoleta.plazoleta.domain.ports.out.DishPersistencePort;
+import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
 import com.plazoleta.plazoleta.infrastructure.entities.DishEntity;
 import com.plazoleta.plazoleta.infrastructure.mappers.DishEntityMapper;
 import com.plazoleta.plazoleta.infrastructure.repositories.mysql.DishRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +29,26 @@ public class DishPersistenceAdapter implements DishPersistencePort {
     public void update(Long id, DishModel dishModel) {
         DishEntity existingDish = dishRepository.findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Dish not found with id " + id)
+                        new IllegalArgumentException(DomainConstants.DISH_NOT_FOUND + id)
                 );
-        // Solo actualizamos precio y descripción
         existingDish.setPrice(dishModel.getPrice());
         existingDish.setDescription(dishModel.getDescription());
-        // Persistimos los cambios
         dishRepository.save(existingDish);
+    }
+
+    @Override
+    public void updateStatus(Long id, DishModel dishModel) {
+        DishEntity existingDish = dishRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(DomainConstants.DISH_NOT_FOUND + id));
+        existingDish.setActive(dishModel.isActive());
+        dishRepository.save(existingDish);
+    }
+
+
+    @Override
+    public DishModel getById(Long id) {
+        DishEntity dishEntity = dishRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(DomainConstants.DISH_NOT_FOUND + id));
+        return dishEntityMapper.entityToModel(dishEntity);
     }
 }

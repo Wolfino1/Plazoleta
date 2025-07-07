@@ -2,6 +2,7 @@ package com.plazoleta.plazoleta.infrastructure.endpoints.rest;
 
 import com.plazoleta.plazoleta.application.dto.request.SaveDishRequest;
 import com.plazoleta.plazoleta.application.dto.request.UpdateDishRequest;
+import com.plazoleta.plazoleta.application.dto.request.UpdateDishStatusRequest;
 import com.plazoleta.plazoleta.application.dto.response.SaveDishResponse;
 import com.plazoleta.plazoleta.application.service.DishService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -95,5 +96,51 @@ public class DishController {
         SaveDishResponse response = dishService.update(id, updateDishRequest);
         return ResponseEntity.ok(response);
     }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @PatchMapping("/{id}/status")
+    @Operation(
+            summary = "Enable or disable dish",
+            description = "This method enables or disables a dish if it belongs to the owner's restaurant",
+            tags = {"Dish"},
+            parameters = {
+                    @Parameter(
+                            name = "id",
+                            in = ParameterIn.PATH,
+                            description = "ID of the dish to update status",
+                            required = true
+                    )
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Active status to set on the dish",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UpdateDishStatusRequest.class)
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Dish status updated successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = SaveDishResponse.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "You are not allowed to modify dishes from another restaurant"
+                    )
+            }
+    )
+    public ResponseEntity<SaveDishResponse> updateDishStatus(
+            @PathVariable Long id,
+            @RequestBody UpdateDishStatusRequest request
+    ) {
+        SaveDishResponse response = dishService.updateDishStatus(id, request);
+        return ResponseEntity.ok(response);
+    }
+
 }
 

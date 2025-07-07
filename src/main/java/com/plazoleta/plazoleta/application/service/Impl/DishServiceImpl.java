@@ -2,6 +2,7 @@ package com.plazoleta.plazoleta.application.service.Impl;
 
 import com.plazoleta.plazoleta.application.dto.request.SaveDishRequest;
 import com.plazoleta.plazoleta.application.dto.request.UpdateDishRequest;
+import com.plazoleta.plazoleta.application.dto.request.UpdateDishStatusRequest;
 import com.plazoleta.plazoleta.application.dto.response.SaveDishResponse;
 import com.plazoleta.plazoleta.application.mappers.DishDtoMapper;
 import com.plazoleta.plazoleta.application.service.DishService;
@@ -27,10 +28,18 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public SaveDishResponse update(Long id, UpdateDishRequest request) {
-        // mapea sólo precio y descripción a un DishModel
         DishModel updatedFields = dishDtoMapper.updateRequestToModel(request);
-        // delega al UseCase con el id y los campos nuevos
         dishServicePort.update(id, updatedFields);
+        return new SaveDishResponse(
+                Constants.UPDATE_DISH_RESPONSE_MESSAGE,
+                LocalDateTime.now()
+        );
+    }
+
+    @Override
+    public SaveDishResponse updateDishStatus(Long id, UpdateDishStatusRequest statusRequest) {
+        DishModel updatedFields = dishDtoMapper.updateStatusRequestToModel(statusRequest);
+        dishServicePort.updateStatus(id, updatedFields);
         return new SaveDishResponse(
                 Constants.UPDATE_DISH_RESPONSE_MESSAGE,
                 LocalDateTime.now()

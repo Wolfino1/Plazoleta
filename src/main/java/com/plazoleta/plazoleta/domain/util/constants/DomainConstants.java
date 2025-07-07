@@ -22,8 +22,8 @@ public class DomainConstants {
     public static final String WRONG_ARGUMENT_URLIMAGE = "URL image can't be null or empty";
     public static final String WRONG_ARGUMENT_CATEGORY = "Category can't be null or empty";
     public static final String WRONG_ARGUMENT_RESTAURANT = "Restaurant can't be null or empty";
-
-
+    public static final String CHANGE_DISH_NOT_ALLOWED = "You are not allowed to update this dish.";
+    public static final String DISH_NOT_FOUND = "Dish was not foud with ID: ";
 
 
 }
