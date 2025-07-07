@@ -26,6 +26,7 @@ public class DomainConstants {
     public static final String WRONG_ARGUMENT_RESTAURANT = "Restaurant can't be null or empty";
     public static final String CHANGE_DISH_NOT_ALLOWED = "You are not allowed to update this dish.";
     public static final String DISH_NOT_FOUND = "Dish was not foud with ID: ";
+    public static final String ORDER_ALREADY_CREATED = "You already have an order created";
 
 
 }

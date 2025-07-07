@@ -1,6 +1,5 @@
 package com.plazoleta.plazoleta.domain.usecases;
 
-import com.plazoleta.plazoleta.application.dto.response.RestaurantResponse;
 import com.plazoleta.plazoleta.domain.models.RestaurantModel;
 import com.plazoleta.plazoleta.domain.ports.in.RestaurantServicePort;
 import com.plazoleta.plazoleta.domain.ports.out.RestaurantPersistencePort;
@@ -35,5 +34,4 @@ public class RestaurantUseCase implements RestaurantServicePort {
                 orderAsc
         );
     }
-
 }
