@@ -1,9 +1,6 @@
 package com.plazoleta.plazoleta.infrastructure.exceptionshandler;
 
-import com.plazoleta.plazoleta.domain.exceptions.EmptyException;
-import com.plazoleta.plazoleta.domain.exceptions.MaxSizeExceededException;
-import com.plazoleta.plazoleta.domain.exceptions.NullException;
-import com.plazoleta.plazoleta.domain.exceptions.WrongArgumentException;
+import com.plazoleta.plazoleta.domain.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -35,6 +32,18 @@ public class ControllerAdvisor {
 
     @ExceptionHandler(WrongArgumentException.class)
     public ResponseEntity<ExceptionResponse> handleWrongArgumentException(WrongArgumentException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ExceptionResponse(exception.getMessage(), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(InvalidPaginationException.class)
+    public ResponseEntity<ExceptionResponse> handleInvalidPaginationException(InvalidPaginationException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ExceptionResponse(exception.getMessage(), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ExceptionResponse> handleUnauthorizedAccessException(UnauthorizedAccessException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ExceptionResponse(exception.getMessage(), LocalDateTime.now()));
     }

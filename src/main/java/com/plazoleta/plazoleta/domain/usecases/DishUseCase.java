@@ -5,6 +5,7 @@ import com.plazoleta.plazoleta.domain.models.DishModel;
 import com.plazoleta.plazoleta.domain.ports.in.DishServicePort;
 import com.plazoleta.plazoleta.domain.ports.out.DishPersistencePort;
 import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
+import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import io.jsonwebtoken.Claims;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -43,4 +44,33 @@ public class DishUseCase implements DishServicePort {
         existingDish.setActive(dishModel.isActive());
         dishPersistencePort.updateStatus(id, existingDish);
     }
-}
+
+        @Override
+        public PagedResult<DishModel> getDishes(
+                Long restaurantId,
+                Integer page,
+                Integer size,
+                String name,
+                Integer price,
+                String description,
+                String urlImage,
+                String category,
+                boolean active,
+                String sortBy,
+                boolean orderAsc) {
+
+            return dishPersistencePort.getDishes(
+                    restaurantId,
+                    page,
+                    size,
+                    name,
+                    price,
+                    description,
+                    urlImage,
+                    category,
+                    active,
+                    sortBy,
+                    orderAsc
+            );
+        }
+    }

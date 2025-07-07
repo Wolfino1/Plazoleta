@@ -14,6 +14,8 @@ public class DomainConstants {
     public static final String PHONENUMBER_EMPTY_MESSAGE = "PhoneNumber field can't be empty";
     public static final String PHONENUMBER_NULL_MESSAGE = "PhoneNumber field can't be null";
     public static final String LOGOURL_EMPTY_MESSAGE = "LogoUrl field can't be empty";
+    public static final String PAGE_NUMBER_INVALID = "Page number cannot be less than 0";
+    public static final String PAGE_SIZE_INVALID = "Page size cannot be less than 0";
     public static final String LOGOURL_NULL_MESSAGE = "LogoUrl field can't be null";
     public static final String OWNERID_NULL_MESSAGE = "OwnerId field can't be null";
     public static final String WRONG_OWNER_ID = "Owner ID must be a positive number";

@@ -10,5 +10,5 @@ import org.mapstruct.ReportingPolicy;
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RestaurantDtoMapper {
     RestaurantModel requestToModel(SaveRestaurantRequest saveCategoryRequest);
-    RestaurantResponse modelToResponse(RestaurantModel categoryModel);
+    RestaurantResponse modelToResponse(RestaurantModel RestaurantModel);
 }

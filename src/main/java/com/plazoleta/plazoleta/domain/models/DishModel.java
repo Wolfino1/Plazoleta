@@ -9,17 +9,17 @@ public class DishModel {
     String name;
     Integer price;
     String description;
-    String urlImagen;
+    String urlImage;
     String category;
     Long restaurantId;
     boolean active = true;
 
-    public DishModel(String name, Integer price, String description, String urlImagen, String category,
+    public DishModel(String name, Integer price, String description, String urlImage, String category,
                      Long restaurantId) {
         this.name = name;
         this.price = price;
         this.description = description;
-        this.urlImagen = urlImagen;
+        this.urlImage = urlImage;
         this.category = category;
         this.restaurantId = restaurantId;
     }
@@ -59,15 +59,15 @@ public class DishModel {
         this.description = description;
     }
 
-    public String getUrlImagen() {
-        return urlImagen;
+    public String getUrlImage() {
+        return urlImage;
     }
 
-    public void setUrlImagen(String urlImagen) {
-        if (urlImagen == null || urlImagen.isEmpty()) {
+    public void setUrlImage(String urlImage) {
+        if (urlImage == null || urlImage.isEmpty()) {
             throw new IllegalArgumentException(DomainConstants.WRONG_ARGUMENT_URLIMAGE);
         }
-        this.urlImagen = urlImagen;
+        this.urlImage = urlImage;
     }
 
     public String getCategory() {

@@ -3,8 +3,10 @@ package com.plazoleta.plazoleta.infrastructure.endpoints.rest;
 import com.plazoleta.plazoleta.application.dto.request.SaveDishRequest;
 import com.plazoleta.plazoleta.application.dto.request.UpdateDishRequest;
 import com.plazoleta.plazoleta.application.dto.request.UpdateDishStatusRequest;
+import com.plazoleta.plazoleta.application.dto.response.DishResponse;
 import com.plazoleta.plazoleta.application.dto.response.SaveDishResponse;
 import com.plazoleta.plazoleta.application.service.DishService;
+import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -140,6 +142,24 @@ public class DishController {
     ) {
         SaveDishResponse response = dishService.updateDishStatus(id, request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{restaurantId}/dishes")
+    public ResponseEntity<PagedResult<DishResponse>> getDishes(
+            @PathVariable Long restaurantId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Integer price,
+            @RequestParam(required = false) String urlImage,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "true") boolean active,
+            @RequestParam(required = false, defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "true") boolean orderAsc) {
+
+        return ResponseEntity.ok(dishService.getDishes(
+                restaurantId, page, size, name, price, description, urlImage, category, active, sortBy ,orderAsc));
     }
 
 }

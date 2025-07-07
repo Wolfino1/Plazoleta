@@ -17,6 +17,7 @@ import com.plazoleta.plazoleta.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -58,7 +59,7 @@ public class BeanConfiguration {
 
     @Bean
     public DishPersistencePort dishPersistencePort(){
-        return new DishPersistenceAdapter(dishRepository, dishEntityMapper);
+        return new DishPersistenceAdapter(dishRepository, dishEntityMapper,restaurantRepository);
     }
 
     @Bean
@@ -66,11 +67,12 @@ public class BeanConfiguration {
         return new JwtAuthenticationFilter(jwtUtil);
     }
 
-    /* @Bean
+    @Bean
     @Order(1)
     public SecurityFilterChain publicApiChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher(
+                .securityMatcher("/api/v1/restaurant/get",
+                       "/api/v1/dish/{restaurantId}/dishes"
                 )
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
@@ -78,10 +80,10 @@ public class BeanConfiguration {
                         auth.anyRequest().permitAll()
                 );
         return http.build();
-    } */
+    }
 
     @Bean
-    //@Order(2)
+    @Order(2)
     public SecurityFilterChain protectedApiChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/v1/**")

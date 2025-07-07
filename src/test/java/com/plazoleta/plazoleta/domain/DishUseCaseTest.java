@@ -41,7 +41,7 @@ class DishUseCaseTest {
         dishModel.setName("Test");
         dishModel.setPrice(100);
         dishModel.setDescription("Desc");
-        dishModel.setUrlImagen("url");
+        dishModel.setUrlImage("url");
         dishModel.setCategory("Cat");
         dishModel.setRestaurantId(1L);
         dishModel.setActive(true);
