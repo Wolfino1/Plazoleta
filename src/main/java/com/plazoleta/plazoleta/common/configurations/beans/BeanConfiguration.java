@@ -47,9 +47,11 @@ public class BeanConfiguration {
     private final DishRepository dishRepository;
     private final DishEntityMapper dishEntityMapper;
     private final OrderRepository orderRepository;
-    private final OrderEntityMapper orderMapper;
     private final JwtUtil jwtUtil;
     private final OrderItemEntityMapper itemMapper;
+    private final OrderEntityMapper orderEntityMapper;
+
+
     @Bean
     public RestaurantServicePort restaurantServicePort() {
         return new RestaurantUseCase(restaurantPersistencePort());
@@ -61,21 +63,24 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public DishServicePort dishServicePort(){
+    public DishServicePort dishServicePort() {
         return new DishUseCase(dishPersistencePort());
     }
 
     @Bean
-    public DishPersistencePort dishPersistencePort(){
-        return new DishPersistenceAdapter(dishRepository, dishEntityMapper,restaurantRepository);
+    public DishPersistencePort dishPersistencePort() {
+        return new DishPersistenceAdapter(dishRepository, dishEntityMapper, restaurantRepository);
     }
+
     @Bean
-    public OrderServicePort orderServicePort(){
+    public OrderServicePort orderServicePort() {
         return new OrderUseCase(orderPersistencePort());
     }
+
     @Bean
-    public OrderPersistencePort orderPersistencePort(){
-        return new OrderPersistenceAdapter(orderRepository, restaurantRepository, dishRepository, itemMapper, orderMapper );
+    public OrderPersistencePort orderPersistencePort() {
+        return new OrderPersistenceAdapter(orderRepository, restaurantRepository, dishRepository, itemMapper,
+                orderEntityMapper);
     }
 
     @Bean
@@ -88,7 +93,7 @@ public class BeanConfiguration {
     public SecurityFilterChain publicApiChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/v1/restaurant/get",
-                       "/api/v1/dish/{restaurantId}/dishes"
+                        "/api/v1/dish/{restaurantId}/dishes"
                 )
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())

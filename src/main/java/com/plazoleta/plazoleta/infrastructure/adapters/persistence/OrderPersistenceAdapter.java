@@ -4,6 +4,7 @@ import com.plazoleta.plazoleta.domain.models.OrderItemModel;
 import com.plazoleta.plazoleta.domain.models.OrderModel;
 import com.plazoleta.plazoleta.domain.models.OrderStatus;
 import com.plazoleta.plazoleta.domain.ports.out.OrderPersistencePort;
+import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import com.plazoleta.plazoleta.infrastructure.entities.DishEntity;
 import com.plazoleta.plazoleta.infrastructure.entities.OrderEntity;
 import com.plazoleta.plazoleta.infrastructure.entities.OrderItemEntity;
@@ -14,6 +15,9 @@ import com.plazoleta.plazoleta.infrastructure.repositories.mysql.DishRepository;
 import com.plazoleta.plazoleta.infrastructure.repositories.mysql.OrderRepository;
 import com.plazoleta.plazoleta.infrastructure.repositories.mysql.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +32,8 @@ public class OrderPersistenceAdapter implements OrderPersistencePort {
     private final RestaurantRepository  restaurantRepository;
     private final DishRepository dishRepository;
     private final OrderItemEntityMapper itemMapper;
-    private final OrderEntityMapper     orderMapper;
+    private final OrderEntityMapper orderEntityMapper;
+
 
     @Override
     public boolean existsByClientAndStatusIn(Long clientId, List<OrderStatus> statuses) {
@@ -56,6 +61,37 @@ public class OrderPersistenceAdapter implements OrderPersistencePort {
 
         orderRepository.save(orderEntity);
     }
+
+    @Override
+    public PagedResult<OrderModel> getOrdersByFilter(
+            Long restaurantId,
+            int page,
+            int size,
+            Long clientId,
+            OrderStatus status
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<Long> dishIds = null;
+        Page<OrderEntity> pageEnt = orderRepository.findByFilters(
+                restaurantId,
+                clientId,
+                status,
+                dishIds,
+                pageable
+        );
+        List<OrderModel> content = pageEnt.stream()
+                .map(orderEntityMapper::entityToModel)
+                .toList();
+        return new PagedResult<>(
+                content,
+                page,
+                size,
+                pageEnt.getTotalElements()
+        );
+
+    }
+
+
 
 }
 

@@ -10,7 +10,7 @@ public class DishModel {
     Integer price;
     String description;
     String urlImage;
-    String category;
+    String category; //Tabla aparte
     Long restaurantId;
     boolean active = true;
 

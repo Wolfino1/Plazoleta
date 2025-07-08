@@ -28,7 +28,8 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public SaveRestaurantResponse save(SaveRestaurantRequest request) {
         restaurantServicePort.save(restaurantDtoMapper.requestToModel(request));
-        return new SaveRestaurantResponse(Constants.SAVE_RESTAURANT_RESPONSE_MESSAGE, LocalDateTime.now());    }
+        return new SaveRestaurantResponse(Constants.SAVE_RESTAURANT_RESPONSE_MESSAGE, LocalDateTime.now());
+    }
 
     @Override
     public PagedResult<RestaurantResponse> getRestaurants(

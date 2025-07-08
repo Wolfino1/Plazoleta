@@ -7,6 +7,7 @@ import com.plazoleta.plazoleta.domain.ports.in.OrderServicePort;
 import com.plazoleta.plazoleta.domain.ports.out.OrderPersistencePort;
 import com.plazoleta.plazoleta.domain.exceptions.BusinessException;
 import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
+import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,4 +33,21 @@ public class OrderUseCase implements OrderServicePort {
         orderModel.setStatus(OrderStatus.PENDIENTE);
         orderPersistencePort.save(orderModel);
     }
+
+    @Override
+    public PagedResult<OrderModel> getOrdersByFilter(
+            Long restaurantId,
+            int page,
+            int size,
+            Long clientId,
+            OrderStatus status) {
+        return orderPersistencePort.getOrdersByFilter(
+                restaurantId,
+                page,
+                size,
+                clientId,
+                status
+        );
+    }
+
 }
