@@ -15,7 +15,7 @@ public interface DishServicePort {
                                          Integer price,
                                          String description,
                                          String urlImage,
-                                         String category,
+                                         Long idCategory,
                                          boolean active,
                                          String sortBy,
                                          boolean orderAsc);

@@ -18,12 +18,12 @@ public class RestaurantModel {
     public RestaurantModel(Long id, String name, String nit, String address, String phoneNumber, String logoUrl,
                            Long ownerId) {
         this.id = id;
-        this.name = name;
-        this.nit = nit;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.logoUrl = logoUrl;
-        this.ownerId = ownerId;
+        setName(name);
+        setNit(nit);
+        setAddress(address);
+        setPhoneNumber(phoneNumber);
+        setLogoUrl(logoUrl);
+        setOwnerId(ownerId);
     }
 
     public Long getId() {

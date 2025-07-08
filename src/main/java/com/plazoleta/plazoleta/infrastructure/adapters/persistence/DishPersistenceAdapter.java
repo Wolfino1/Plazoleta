@@ -78,7 +78,7 @@ public class DishPersistenceAdapter implements DishPersistencePort {
             Integer price,
             String description,
             String urlImage,
-            String category,
+            Long categoryId,
             boolean active,
             String sortBy,
             boolean orderAsc) {
@@ -95,7 +95,7 @@ public class DishPersistenceAdapter implements DishPersistencePort {
                 price,
                 description,
                 urlImage,
-                category,
+                categoryId,
                 active,
                 pageable
         );

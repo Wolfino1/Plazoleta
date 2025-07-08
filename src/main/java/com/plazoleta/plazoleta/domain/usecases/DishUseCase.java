@@ -1,23 +1,46 @@
 package com.plazoleta.plazoleta.domain.usecases;
 
 import com.plazoleta.plazoleta.domain.exceptions.UnauthorizedAccessException;
+import com.plazoleta.plazoleta.domain.exceptions.WrongArgumentException;
 import com.plazoleta.plazoleta.domain.models.DishModel;
+import com.plazoleta.plazoleta.domain.models.RestaurantModel;
 import com.plazoleta.plazoleta.domain.ports.in.DishServicePort;
 import com.plazoleta.plazoleta.domain.ports.out.DishPersistencePort;
+import com.plazoleta.plazoleta.domain.ports.out.RestaurantPersistencePort;
 import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import io.jsonwebtoken.Claims;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 public class DishUseCase implements DishServicePort {
     private final DishPersistencePort dishPersistencePort;
+    private final RestaurantPersistencePort restaurantPersistencePort;
 
-    public DishUseCase(DishPersistencePort dishPersistencePort) {
+    public DishUseCase(DishPersistencePort dishPersistencePort, RestaurantPersistencePort restaurantPersistencePort) {
         this.dishPersistencePort = dishPersistencePort;
+        this.restaurantPersistencePort = restaurantPersistencePort;
     }
+
 
     @Override
     public void save(DishModel dishModel) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Claims claims = (Claims) auth.getPrincipal();
+        Long ownerId = claims.get("ownerId", Long.class);
+
+        RestaurantModel restaurant = restaurantPersistencePort
+                .findById(dishModel.getRestaurantId())
+                .orElseThrow(() -> new WrongArgumentException(
+                        DomainConstants.NON_EXISTING_RESTAURANT
+                ));
+
+        if (!restaurant.getOwnerId().equals(ownerId)) {
+            throw new UnauthorizedAccessException(DomainConstants.CREATE_DISH_NOT_ALLOWED);
+        }
+
         dishPersistencePort.save(dishModel);
     }
 
@@ -54,7 +77,7 @@ public class DishUseCase implements DishServicePort {
                 Integer price,
                 String description,
                 String urlImage,
-                String category,
+                Long idCategory,
                 boolean active,
                 String sortBy,
                 boolean orderAsc) {
@@ -67,7 +90,7 @@ public class DishUseCase implements DishServicePort {
                     price,
                     description,
                     urlImage,
-                    category,
+                    idCategory,
                     active,
                     sortBy,
                     orderAsc

@@ -3,6 +3,7 @@ package com.plazoleta.plazoleta.domain;
 import com.plazoleta.plazoleta.domain.models.DishModel;
 import com.plazoleta.plazoleta.domain.ports.out.DishPersistencePort;
 import com.plazoleta.plazoleta.domain.exceptions.UnauthorizedAccessException;
+import com.plazoleta.plazoleta.domain.ports.out.RestaurantPersistencePort;
 import com.plazoleta.plazoleta.domain.usecases.DishUseCase;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import io.jsonwebtoken.Claims;
@@ -30,7 +31,7 @@ class DishUseCaseTest {
     @BeforeEach
     void setUp() {
         persistencePort = mock(DishPersistencePort.class);
-        useCase = new DishUseCase(persistencePort);
+        useCase = new DishUseCase(persistencePort,);
     }
 
     @AfterEach

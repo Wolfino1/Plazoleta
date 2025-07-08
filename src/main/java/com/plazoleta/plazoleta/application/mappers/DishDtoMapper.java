@@ -12,6 +12,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface DishDtoMapper {
+    @Mapping(source = "idCategory", target = "category")
     DishModel requestToModel(SaveDishRequest saveDishRequest);
     @Mapping(target = "price",       source = "price")
     @Mapping(target = "description", source = "description")

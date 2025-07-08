@@ -2,26 +2,27 @@ package com.plazoleta.plazoleta.domain.models;
 
 import com.plazoleta.plazoleta.domain.exceptions.EmptyException;
 import com.plazoleta.plazoleta.domain.exceptions.NullException;
+import com.plazoleta.plazoleta.domain.exceptions.WrongArgumentException;
 import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
 
 public class DishModel {
-    Long id;
-    String name;
-    Integer price;
-    String description;
-    String urlImage;
-    String category; //Tabla aparte
-    Long restaurantId;
+    private Long id;
+    private String name;
+    private Integer price;
+    private String description;
+    private String urlImage;
+    private Long  idCategory;
+    private Long restaurantId;
     boolean active = true;
 
-    public DishModel(String name, Integer price, String description, String urlImage, String category,
+    public DishModel(String name, Integer price, String description, String urlImage, Long  idCategory,
                      Long restaurantId) {
-        this.name = name;
-        this.price = price;
-        this.description = description;
-        this.urlImage = urlImage;
-        this.category = category;
-        this.restaurantId = restaurantId;
+        setName(name);
+        setPrice(price);
+        setDescription(description);
+        setUrlImage(urlImage);
+        setCategory(idCategory);
+        setRestaurantId(restaurantId);
     }
 
     public DishModel() {
@@ -43,7 +44,7 @@ public class DishModel {
 
     public void setPrice(Integer price) {
         if (price == null || price <= 0) {
-            throw new IllegalArgumentException(DomainConstants.WRONG_ARGUMENT_PRICE);
+            throw new WrongArgumentException(DomainConstants.WRONG_ARGUMENT_PRICE);
         }
         this.price = price;
     }
@@ -54,7 +55,7 @@ public class DishModel {
 
     public void setDescription(String description) {
         if (description == null || description.isEmpty()) {
-            throw new IllegalArgumentException(DomainConstants.WRONG_ARGUMENT_DESCRIPTION);
+            throw new WrongArgumentException(DomainConstants.WRONG_ARGUMENT_DESCRIPTION);
         }
         this.description = description;
     }
@@ -65,29 +66,33 @@ public class DishModel {
 
     public void setUrlImage(String urlImage) {
         if (urlImage == null || urlImage.isEmpty()) {
-            throw new IllegalArgumentException(DomainConstants.WRONG_ARGUMENT_URLIMAGE);
+            throw new WrongArgumentException(DomainConstants.WRONG_ARGUMENT_URLIMAGE);
         }
         this.urlImage = urlImage;
     }
 
-    public String getCategory() {
-        return category;
+    public long getCategory() {
+        if (idCategory == null) {
+            throw new WrongArgumentException(DomainConstants.ID_CATEGORY_MISSING);
+        }
+        return idCategory;
     }
 
-    public void setCategory(String category) {
-        if (category == null || category.isEmpty()) {
-            throw new IllegalArgumentException(DomainConstants.WRONG_ARGUMENT_CATEGORY);
+    public void setCategory(Long idCategory) {
+        if (idCategory == null || idCategory <= 0) {
+            throw new WrongArgumentException(DomainConstants.WRONG_ARGUMENT_CATEGORY);
         }
-        this.category = category;
+        this.idCategory = idCategory;
     }
+
 
     public Long getRestaurantId() {
         return restaurantId;
     }
 
     public void setRestaurantId(Long restaurantId) {
-        if (restaurantId == null) {
-            throw new IllegalArgumentException(DomainConstants.WRONG_ARGUMENT_RESTAURANT);
+        if (restaurantId == null|| restaurantId <= 0) {
+            throw new WrongArgumentException(DomainConstants.WRONG_ARGUMENT_RESTAURANT);
         }
         this.restaurantId = restaurantId;
     }

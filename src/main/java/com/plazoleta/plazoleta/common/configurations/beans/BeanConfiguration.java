@@ -1,21 +1,23 @@
 package com.plazoleta.plazoleta.common.configurations.beans;
 
+import com.plazoleta.plazoleta.domain.ports.in.CategoryServicePort;
 import com.plazoleta.plazoleta.domain.ports.in.DishServicePort;
 import com.plazoleta.plazoleta.domain.ports.in.OrderServicePort;
 import com.plazoleta.plazoleta.domain.ports.in.RestaurantServicePort;
+import com.plazoleta.plazoleta.domain.ports.out.CategoryPersistencePort;
 import com.plazoleta.plazoleta.domain.ports.out.DishPersistencePort;
 import com.plazoleta.plazoleta.domain.ports.out.OrderPersistencePort;
 import com.plazoleta.plazoleta.domain.ports.out.RestaurantPersistencePort;
+import com.plazoleta.plazoleta.domain.usecases.CategoryUseCase;
 import com.plazoleta.plazoleta.domain.usecases.DishUseCase;
 import com.plazoleta.plazoleta.domain.usecases.OrderUseCase;
 import com.plazoleta.plazoleta.domain.usecases.RestaurantUseCase;
+import com.plazoleta.plazoleta.infrastructure.adapters.persistence.CategoryPersistenceAdapter;
 import com.plazoleta.plazoleta.infrastructure.adapters.persistence.DishPersistenceAdapter;
 import com.plazoleta.plazoleta.infrastructure.adapters.persistence.OrderPersistenceAdapter;
 import com.plazoleta.plazoleta.infrastructure.adapters.persistence.RestaurantPersistenceAdapter;
-import com.plazoleta.plazoleta.infrastructure.mappers.DishEntityMapper;
-import com.plazoleta.plazoleta.infrastructure.mappers.OrderEntityMapper;
-import com.plazoleta.plazoleta.infrastructure.mappers.OrderItemEntityMapper;
-import com.plazoleta.plazoleta.infrastructure.mappers.RestaurantEntityMapper;
+import com.plazoleta.plazoleta.infrastructure.mappers.*;
+import com.plazoleta.plazoleta.infrastructure.repositories.mysql.CategoryRepository;
 import com.plazoleta.plazoleta.infrastructure.repositories.mysql.DishRepository;
 import com.plazoleta.plazoleta.infrastructure.repositories.mysql.OrderRepository;
 import com.plazoleta.plazoleta.infrastructure.repositories.mysql.RestaurantRepository;
@@ -50,6 +52,8 @@ public class BeanConfiguration {
     private final JwtUtil jwtUtil;
     private final OrderItemEntityMapper itemMapper;
     private final OrderEntityMapper orderEntityMapper;
+    private final CategoryRepository categoryRepository;
+    private final CategoryEntityMapper categoryEntityMapper;
 
 
     @Bean
@@ -64,12 +68,20 @@ public class BeanConfiguration {
 
     @Bean
     public DishServicePort dishServicePort() {
-        return new DishUseCase(dishPersistencePort());
+        return new DishUseCase(dishPersistencePort(),restaurantPersistencePort());
     }
 
     @Bean
     public DishPersistencePort dishPersistencePort() {
         return new DishPersistenceAdapter(dishRepository, dishEntityMapper, restaurantRepository);
+    }
+
+    @Bean public CategoryPersistencePort categoryPersistencePort(){
+        return new CategoryPersistenceAdapter(categoryRepository,categoryEntityMapper);
+    }
+
+    @Bean public CategoryServicePort categoryServicePort(){
+        return new CategoryUseCase(categoryPersistencePort());
     }
 
     @Bean

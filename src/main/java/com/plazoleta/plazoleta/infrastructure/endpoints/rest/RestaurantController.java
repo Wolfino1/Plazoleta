@@ -2,6 +2,7 @@ package com.plazoleta.plazoleta.infrastructure.endpoints.rest;
 
 import com.plazoleta.plazoleta.application.dto.request.SaveRestaurantRequest;
 import com.plazoleta.plazoleta.application.dto.response.RestaurantResponse;
+import com.plazoleta.plazoleta.application.dto.response.SaveDishResponse;
 import com.plazoleta.plazoleta.application.dto.response.SaveRestaurantResponse;
 import com.plazoleta.plazoleta.application.service.RestaurantService;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;

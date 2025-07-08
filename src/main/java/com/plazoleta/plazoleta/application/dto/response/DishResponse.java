@@ -4,6 +4,6 @@ public record DishResponse (String name,
         Integer price,
         String description,
         String urlImage,
-        String category,
+        Long idCategory,
         boolean active){
 }

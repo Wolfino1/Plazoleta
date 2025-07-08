@@ -3,7 +3,7 @@ package com.plazoleta.plazoleta.domain.util.constants;
 public class DomainConstants {
     public static final String WRONG_ARGUMENT_NIT_MESSAGE = "NIT can only contain numbers";
     public static final String MAX_SIZE_EXCEEDED_PHONE_NUMBER = "Phone number can only contain 13 characters";
-    public static final String WRONG_ARGUMENT_PHONE_MESSAGE = "phone number must begin with "+" followed by 12 numbers";
+    public static final String WRONG_ARGUMENT_PHONE_MESSAGE = "Phone number must begin with + followed by 12 numbers";
     public static final String WRONG_ARGUMENT_NAME = "Name can't only contain numbers";
     public static final String NAME_EMPTY_MESSAGE = "Name field can't be empty";
     public static final String NAME_NULL_MESSAGE = "Name field can't be null";
@@ -25,8 +25,12 @@ public class DomainConstants {
     public static final String WRONG_ARGUMENT_CATEGORY = "Category can't be null or empty";
     public static final String WRONG_ARGUMENT_RESTAURANT = "Restaurant can't be null or empty";
     public static final String CHANGE_DISH_NOT_ALLOWED = "You are not allowed to update this dish.";
+    public static final String CREATE_DISH_NOT_ALLOWED = "You are not allowed to create this dish.";
     public static final String DISH_NOT_FOUND = "Dish was not foud with ID: ";
     public static final String ORDER_ALREADY_CREATED = "You already have an order created";
+    public static final String ID_CATEGORY_MISSING = "Category ID is missing";
+    public static final String NON_EXISTING_RESTAURANT = "Restaurant does not exist";
+
 
 
 }

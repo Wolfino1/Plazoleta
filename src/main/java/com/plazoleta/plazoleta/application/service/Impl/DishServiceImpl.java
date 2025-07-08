@@ -58,7 +58,7 @@ public class DishServiceImpl implements DishService {
             Integer price,
             String description,
             String urlImage,
-            String category,
+            Long idCategory,
             boolean active,
             String sortBy,
             boolean orderAsc) {
@@ -71,7 +71,7 @@ public class DishServiceImpl implements DishService {
                 price,
                 description,
                 urlImage,
-                category,
+                idCategory,
                 active,
                 sortBy,
                 orderAsc

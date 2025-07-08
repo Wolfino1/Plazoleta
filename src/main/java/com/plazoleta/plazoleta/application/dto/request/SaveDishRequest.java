@@ -5,7 +5,7 @@ public record SaveDishRequest(
         Integer price,
         String description,
         String urlImage,
-        String category,
+        Long idCategory,
         Long restaurantId
 ) {
 }

@@ -153,13 +153,13 @@ public class DishController {
             @RequestParam(required = false) Integer price,
             @RequestParam(required = false) String urlImage,
             @RequestParam(required = false) String description,
-            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Long categoryId,
             @RequestParam(defaultValue = "true") boolean active,
             @RequestParam(required = false, defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "true") boolean orderAsc) {
 
         return ResponseEntity.ok(dishService.getDishes(
-                restaurantId, page, size, name, price, description, urlImage, category, active, sortBy ,orderAsc));
+                restaurantId, page, size, name, price, description, urlImage, categoryId, active, sortBy ,orderAsc));
     }
 
 }

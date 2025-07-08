@@ -19,7 +19,7 @@ public interface DishService {
                                          Integer price,
                                          String description,
                                          String urlImage,
-                                         String category,
+                                         Long idCategory,
                                          boolean active,
                                          String sortBy,
                                          boolean orderAsc);

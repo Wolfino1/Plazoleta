@@ -18,8 +18,9 @@ public class DishEntity {
     Integer price;
     String description;
     String urlImage;
-    String category;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private CategoryEntity category;    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
     boolean active = true;

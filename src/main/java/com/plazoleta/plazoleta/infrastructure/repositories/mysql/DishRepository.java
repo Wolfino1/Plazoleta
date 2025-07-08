@@ -17,18 +17,19 @@ public interface DishRepository extends JpaRepository<DishEntity, Long> {
          AND (:price       IS NULL OR d.price              = :price)
          AND (:description IS NULL OR LOWER(d.description) LIKE LOWER(CONCAT('%', :description, '%')))
          AND (:urlImage    IS NULL OR LOWER(d.urlImage)    LIKE LOWER(CONCAT('%', :urlImage, '%')))
-         AND (:category    IS NULL OR LOWER(d.category)    LIKE LOWER(CONCAT('%', :category, '%')))
+         AND (:categoryId  IS NULL OR d.category.id        = :categoryId)
          AND d.active = :active
-    """)
+""")
     Page<DishEntity> findWithFilters(
-            @Param("restaurantId") Long restaurantId,
+            @Param("restaurantId")  Long restaurantId,
             @Param("name")          String name,
             @Param("price")         Integer price,
             @Param("description")   String description,
             @Param("urlImage")      String urlImage,
-            @Param("category")      String category,
+            @Param("categoryId")    Long categoryId,
             @Param("active")        boolean active,
             Pageable pageable
     );
+
 }
 
