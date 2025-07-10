@@ -1,7 +1,10 @@
 package com.plazoleta.plazoleta.domain.ports.out;
 
 import com.plazoleta.plazoleta.domain.models.DishModel;
+import com.plazoleta.plazoleta.domain.models.RestaurantModel;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
+
+import java.util.Optional;
 
 public interface DishPersistencePort {
     void save (DishModel dishModel);
@@ -19,4 +22,6 @@ public interface DishPersistencePort {
                                       boolean active,
                                       String sortBy,
                                       boolean orderAsc);
+    Optional<DishModel> findById(Long id);
+
 }

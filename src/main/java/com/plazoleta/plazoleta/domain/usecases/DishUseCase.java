@@ -11,9 +11,7 @@ import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import io.jsonwebtoken.Claims;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;  //Sacar esto de aca
 
 public class DishUseCase implements DishServicePort {
     private final DishPersistencePort dishPersistencePort;
@@ -29,7 +27,7 @@ public class DishUseCase implements DishServicePort {
     public void save(DishModel dishModel) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Claims claims = (Claims) auth.getPrincipal();
-        Long ownerId = claims.get("ownerId", Long.class);
+        Long ownerId = claims.get(DomainConstants.OWNER_ID, Long.class);
 
         RestaurantModel restaurant = restaurantPersistencePort
                 .findById(dishModel.getRestaurantId())
@@ -45,9 +43,31 @@ public class DishUseCase implements DishServicePort {
     }
 
     @Override
-    public void update(Long id, DishModel dishModel) {
-        dishPersistencePort.update(id, dishModel);
+    public void update(Long id, DishModel updatedFields) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long ownerId = ((Claims) auth.getPrincipal()).get(DomainConstants.OWNER_ID, Long.class);
+
+        DishModel existing = dishPersistencePort.getById(id);
+        if (existing == null) {
+            throw new WrongArgumentException(DomainConstants.DISH_NOT_FOUND);
+
+        }
+
+        RestaurantModel rest = restaurantPersistencePort
+                .findById(existing.getRestaurantId())
+                .orElseThrow(() -> new WrongArgumentException(
+                        DomainConstants.NON_EXISTING_RESTAURANT
+                ));
+        if (!rest.getOwnerId().equals(ownerId)) {
+            throw new UnauthorizedAccessException(DomainConstants.UPDATE_DISH_NOT_ALLOWED);
+        }
+
+        existing.setPrice(updatedFields.getPrice());
+        existing.setDescription(updatedFields.getDescription());
+
+        dishPersistencePort.update(id, existing);
     }
+
 
     @Override
     public void updateStatus(Long id, DishModel dishModel) {
@@ -55,18 +75,26 @@ public class DishUseCase implements DishServicePort {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-
-        Long userId = claims.get("ownerId", Long.class);
+        Long ownerId = claims.get(DomainConstants.OWNER_ID, Long.class);
 
         DishModel existingDish = dishPersistencePort.getById(id);
+        if (existingDish == null) {
+            throw new WrongArgumentException(DomainConstants.DISH_NOT_FOUND);
+        }
 
-        if (!existingDish.getRestaurantId().equals(userId)) {
+        RestaurantModel rest = restaurantPersistencePort
+                .findById(existingDish.getRestaurantId())
+                .orElseThrow(() -> new WrongArgumentException(
+                        DomainConstants.NON_EXISTING_RESTAURANT
+                ));
+        if (!rest.getOwnerId().equals(ownerId)) {
             throw new UnauthorizedAccessException(DomainConstants.CHANGE_DISH_NOT_ALLOWED);
         }
 
         existingDish.setActive(dishModel.isActive());
         dishPersistencePort.updateStatus(id, existingDish);
     }
+
 
         @Override
         public PagedResult<DishModel> getDishes(

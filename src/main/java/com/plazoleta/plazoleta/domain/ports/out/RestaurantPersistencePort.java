@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public interface RestaurantPersistencePort {
     void save(RestaurantModel restaurantModel);
-    PagedResult<RestaurantModel> getRestaurants (Integer page, Integer size, String name,
-                                                    String logoUrl, String sortBy, boolean orderAsc);
+    PagedResult<RestaurantModel> getRestaurants (Integer page, Integer size, Long id, String name,
+                                                 Long ownerId, String logoUrl, String sortBy, boolean orderAsc);
     Optional<RestaurantModel> findById(Long id);
 
 }

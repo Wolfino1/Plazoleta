@@ -6,6 +6,6 @@ import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 
 public interface RestaurantServicePort {
     void save(RestaurantModel restaurantModel);
-    PagedResult<RestaurantModel> getRestaurants (Integer page, Integer size, String name,
-                                                    String logoUrl, String sortBy, boolean orderAsc);
+    PagedResult<RestaurantModel> getRestaurants (Integer page, Integer size, Long id, String name,
+                                                 Long ownerId, String logoUrl, String sortBy, boolean orderAsc);
 }

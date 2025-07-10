@@ -26,10 +26,16 @@ public class DomainConstants {
     public static final String WRONG_ARGUMENT_RESTAURANT = "Restaurant can't be null or empty";
     public static final String CHANGE_DISH_NOT_ALLOWED = "You are not allowed to update this dish.";
     public static final String CREATE_DISH_NOT_ALLOWED = "You are not allowed to create this dish.";
+    public static final String UPDATE_DISH_NOT_ALLOWED = "You are not allowed to update this dish.";
     public static final String DISH_NOT_FOUND = "Dish was not foud with ID: ";
     public static final String ORDER_ALREADY_CREATED = "You already have an order created";
     public static final String ID_CATEGORY_MISSING = "Category ID is missing";
     public static final String NON_EXISTING_RESTAURANT = "Restaurant does not exist";
+    public static final String NON_EXISTING_DISH = "Dish does not exist";
+    public static final String NOT_ALLOWED_TO_CHECK_OTHER_RESTAURANTS_ORDERS = "You are not allowed to check " +
+            "the orders for restaurants where you don't work";
+    public static final String OWNER_ID = "ownerId";
+
 
 
 

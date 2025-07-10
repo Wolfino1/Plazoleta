@@ -44,9 +44,7 @@ public class OrderServiceImpl implements OrderService {
                     List<OrderItemResponse> items = orderModel.getItems().stream()
                             .map(itemModel -> new OrderItemResponse(
                                     itemModel.getDishId(),
-                                    null,                    // dishName
-                                    itemModel.getQuantity(),
-                                    null                     // unitPrice
+                                    itemModel.getQuantity()
                             ))
                             .collect(Collectors.toList());
 
@@ -66,6 +64,4 @@ public class OrderServiceImpl implements OrderService {
                 orderPage.getTotalElements()
         );
     }
-
-
 }

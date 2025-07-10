@@ -24,6 +24,7 @@ import com.plazoleta.plazoleta.infrastructure.repositories.mysql.RestaurantRepos
 import com.plazoleta.plazoleta.infrastructure.security.JwtAuthenticationFilter;
 import com.plazoleta.plazoleta.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -38,6 +39,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
+
+import java.time.Duration;
 
 @Configuration
 @RequiredArgsConstructor
@@ -54,7 +58,6 @@ public class BeanConfiguration {
     private final OrderEntityMapper orderEntityMapper;
     private final CategoryRepository categoryRepository;
     private final CategoryEntityMapper categoryEntityMapper;
-
 
     @Bean
     public RestaurantServicePort restaurantServicePort() {
@@ -86,7 +89,7 @@ public class BeanConfiguration {
 
     @Bean
     public OrderServicePort orderServicePort() {
-        return new OrderUseCase(orderPersistencePort());
+        return new OrderUseCase(orderPersistencePort(),dishPersistencePort(),restaurantPersistencePort(),jwtUtil);
     }
 
     @Bean
@@ -125,6 +128,7 @@ public class BeanConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/restaurant/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/dish/**").hasRole("OWNER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/restaurants/get").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/order/**").hasRole("CLIENT")
                         .anyRequest().authenticated()
                 )
@@ -132,6 +136,7 @@ public class BeanConfiguration {
                         UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

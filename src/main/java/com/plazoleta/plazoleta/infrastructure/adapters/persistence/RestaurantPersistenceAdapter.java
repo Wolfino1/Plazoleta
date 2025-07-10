@@ -35,7 +35,9 @@ public class RestaurantPersistenceAdapter implements RestaurantPersistencePort {
     public PagedResult<RestaurantModel> getRestaurants(
             Integer page,
             Integer size,
+            Long id,
             String name,
+            Long ownerId,
             String logoUrl,
             String sortBy,
             boolean orderAsc) {
@@ -46,7 +48,7 @@ public class RestaurantPersistenceAdapter implements RestaurantPersistencePort {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<RestaurantEntity> pageEntities =
-                restaurantRepository.findWithFilters(name, logoUrl, pageable);
+                restaurantRepository.findWithFilters(id, name, logoUrl, ownerId, pageable);
 
         List<RestaurantModel> content = pageEntities.getContent().stream()
                 .map(restaurantEntityMapper::entityToModel)

@@ -52,4 +52,11 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ExceptionResponse(exception.getMessage(), LocalDateTime.now()));
     }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ExceptionResponse> handleUnauthorizedException(UnauthorizedException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ExceptionResponse(exception.getMessage(), LocalDateTime.now()));
+    }
+
 }

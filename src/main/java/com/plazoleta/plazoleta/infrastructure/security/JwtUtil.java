@@ -1,9 +1,12 @@
 package com.plazoleta.plazoleta.infrastructure.security;
 
+import com.plazoleta.plazoleta.domain.exceptions.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -39,5 +42,23 @@ public class JwtUtil {
             return false;
         }
     }
+
+    public Long getRestaurantIdFromSecurityContext() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new UnauthorizedException("Usuario no autenticado");
+        }
+        if (auth.getPrincipal() instanceof Claims claims) {
+            Number rest = claims.get("restaurantId", Number.class);
+            if (rest == null) {
+                throw new UnauthorizedException("Este usuario no tiene asociado ningún restaurante");
+            }
+            return rest.longValue();
+        }
+        throw new UnauthorizedException("Principal inválido para extraer restaurante");
+    }
+
+
+
 }
 

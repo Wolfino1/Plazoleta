@@ -1,6 +1,7 @@
 package com.plazoleta.plazoleta.infrastructure.adapters.persistence;
 
 import com.plazoleta.plazoleta.domain.models.DishModel;
+import com.plazoleta.plazoleta.domain.models.RestaurantModel;
 import com.plazoleta.plazoleta.domain.ports.out.DishPersistencePort;
 import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -111,5 +113,10 @@ public class DishPersistenceAdapter implements DishPersistencePort {
                 pageEntities.getTotalElements()
         );
     }
+
+    @Override
+    public Optional<DishModel> findById(Long id) {
+        return dishRepository.findById(id)
+                .map(dishEntityMapper::entityToModel);    }
 
 }

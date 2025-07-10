@@ -35,7 +35,9 @@ public class RestaurantServiceImpl implements RestaurantService {
     public PagedResult<RestaurantResponse> getRestaurants(
             Integer page,
             Integer size,
+            Long id,
             String name,
+            Long ownerId,
             String logoUrl,
             String sortBy,
             boolean orderAsc) {
@@ -43,14 +45,16 @@ public class RestaurantServiceImpl implements RestaurantService {
         PagedResult<RestaurantModel> modelPage = restaurantServicePort.getRestaurants(
                 page,
                 size,
+                id,
                 name,
+                ownerId,
                 logoUrl,
                 sortBy,
                 orderAsc
         );
 
         List<RestaurantResponse> content = modelPage.getContent().stream()
-                .map(r -> new RestaurantResponse(r.getName(), r.getLogoUrl()))
+                .map(r -> new RestaurantResponse(r.getId(),r.getName(), r.getLogoUrl(), r.getOwnerId()))
                 .toList();
 
         return pageMapper.fromPage(content, modelPage);

@@ -10,11 +10,11 @@ public class OrderModel {
     private List<OrderItemModel> items;
 
     public OrderModel(Long id, Long clientId, Long restaurantId, OrderStatus status, List<OrderItemModel> items) {
-        this.id = id;
-        this.clientId = clientId;
-        this.restaurantId = restaurantId;
-        this.status = status;
-        this.items = items;
+        setId(id);
+        setClientId(clientId);
+        setRestaurantId(restaurantId);
+        setStatus(status);
+        setItems(items);
     }
 
     public Long getId() {

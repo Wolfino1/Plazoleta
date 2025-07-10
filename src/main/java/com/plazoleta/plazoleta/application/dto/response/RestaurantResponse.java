@@ -1,4 +1,4 @@
 package com.plazoleta.plazoleta.application.dto.response;
 
-public record RestaurantResponse(String name, String logoUrl) {
+public record RestaurantResponse(Long id, String name, String logoUrl, Long ownerId) {
 }

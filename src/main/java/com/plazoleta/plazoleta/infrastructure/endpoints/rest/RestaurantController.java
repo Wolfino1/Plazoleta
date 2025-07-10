@@ -43,12 +43,14 @@ public class RestaurantController {
     public ResponseEntity<PagedResult<RestaurantResponse>> getRestaurants(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Long id,
             @RequestParam(required = false) String name,
+            @RequestParam(required = false) Long ownerId,
             @RequestParam(required = false) String logoUrl,
             @RequestParam(required = false, defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "true") boolean orderAsc) {
 
         return ResponseEntity.ok(restaurantService.getRestaurants(
-                page, size, name, logoUrl, sortBy ,orderAsc));
+                page, size, id, name, ownerId ,logoUrl, sortBy ,orderAsc));
     }
 }

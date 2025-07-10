@@ -47,18 +47,17 @@ public class OrderPersistenceAdapter implements OrderPersistencePort {
         orderEntity.setStatus(orderModel.getStatus());
 
         RestaurantEntity rest = restaurantRepository.findById(orderModel.getRestaurantId())
-                .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
         orderEntity.setRestaurant(rest);
 
         for (OrderItemModel itemModel : orderModel.getItems()) {
             OrderItemEntity itemEntity = itemMapper.modelToEntity(itemModel);
             DishEntity dish = dishRepository.findById(itemModel.getDishId())
-                    .orElseThrow(() -> new RuntimeException("Dish no encontrado: " + itemModel.getDishId()));
+                    .orElseThrow(() -> new RuntimeException("Dish not found: " + itemModel.getDishId()));
             itemEntity.setDish(dish);
             itemEntity.setOrder(orderEntity);
             orderEntity.getItems().add(itemEntity);
         }
-
         orderRepository.save(orderEntity);
     }
 
@@ -71,28 +70,34 @@ public class OrderPersistenceAdapter implements OrderPersistencePort {
             OrderStatus status
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Long> dishIds = null;
         Page<OrderEntity> pageEnt = orderRepository.findByFilters(
-                restaurantId,
-                clientId,
-                status,
-                dishIds,
-                pageable
+                restaurantId, clientId, status, null, pageable
         );
+
         List<OrderModel> content = pageEnt.stream()
-                .map(orderEntityMapper::entityToModel)
+                .map(entity -> {
+                    OrderModel m = orderEntityMapper.entityToModel(entity);
+                    List<OrderItemModel> items = entity.getItems().stream()
+                            .map(itemEnt -> {
+                                OrderItemModel item = new OrderItemModel(
+                                        itemEnt.getDish().getId(),
+                                        itemEnt.getQuantity()
+                                );
+                                return item;
+                            })
+                            .toList();
+                    m.setItems(items);
+                    return m;
+                })
                 .toList();
+
         return new PagedResult<>(
                 content,
-                page,
-                size,
+                pageEnt.getNumber(),
+                pageEnt.getSize(),
                 pageEnt.getTotalElements()
         );
-
     }
-
-
-
 }
 
 

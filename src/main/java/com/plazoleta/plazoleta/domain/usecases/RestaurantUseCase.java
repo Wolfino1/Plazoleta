@@ -21,14 +21,18 @@ public class RestaurantUseCase implements RestaurantServicePort {
     public PagedResult<RestaurantModel> getRestaurants(
             Integer page,
             Integer size,
+            Long id,
             String name,
+            Long ownerId,
             String logoUrl,
             String sortBy,
             boolean orderAsc) {
         return restaurantPersistencePort.getRestaurants(
                 page,
                 size,
+                id,
                 name,
+                ownerId,
                 logoUrl,
                 sortBy,
                 orderAsc

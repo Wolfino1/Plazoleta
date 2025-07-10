@@ -15,14 +15,19 @@ public class DishModel {
     private Long restaurantId;
     boolean active = true;
 
-    public DishModel(String name, Integer price, String description, String urlImage, Long  idCategory,
+    public DishModel(Long id, String name, Integer price, String description, String urlImage, Long  idCategory,
                      Long restaurantId) {
+        this.id = id;
         setName(name);
         setPrice(price);
         setDescription(description);
         setUrlImage(urlImage);
         setCategory(idCategory);
         setRestaurantId(restaurantId);
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public DishModel() {

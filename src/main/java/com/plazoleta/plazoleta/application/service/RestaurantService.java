@@ -7,6 +7,6 @@ import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 
 public interface RestaurantService {
     SaveRestaurantResponse save(SaveRestaurantRequest request);
-    PagedResult<RestaurantResponse> getRestaurants (Integer page, Integer size, String name,
-                                                    String logoUrl, String sortBy, boolean orderAsc);
+    PagedResult<RestaurantResponse> getRestaurants (Integer page, Integer size, Long id, String name,
+                                                    Long ownerId, String logoUrl, String sortBy, boolean orderAsc);
 }
