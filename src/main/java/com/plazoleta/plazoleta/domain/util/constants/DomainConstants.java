@@ -35,7 +35,11 @@ public class DomainConstants {
     public static final String NOT_ALLOWED_TO_CHECK_OTHER_RESTAURANTS_ORDERS = "You are not allowed to check " +
             "the orders for restaurants where you don't work";
     public static final String OWNER_ID = "ownerId";
-
+    public static final String ORDER_NOT_FOUND = "Order not found";
+    public static final String ORDER_NOT_PENDING = "Order must be in pending to be assigned";
+    public static final String EMPLOYEE_ID_MANDATORY = "Employee Id can't be null";
+    public static final String NOT_ALLOWED_TO_ASSIGN_ORDERS = "You can't assign orders to that employee";
+    public static final String EMPLOYEE_ID = "employeeId";
 
 
 

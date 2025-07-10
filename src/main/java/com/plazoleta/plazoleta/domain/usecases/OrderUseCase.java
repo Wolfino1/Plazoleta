@@ -1,6 +1,7 @@
 package com.plazoleta.plazoleta.domain.usecases;
 
 
+import com.plazoleta.plazoleta.domain.exceptions.UnauthorizedAccessException;
 import com.plazoleta.plazoleta.domain.exceptions.UnauthorizedException;
 import com.plazoleta.plazoleta.domain.exceptions.WrongArgumentException;
 import com.plazoleta.plazoleta.domain.models.*;
@@ -82,4 +83,47 @@ public class OrderUseCase implements OrderServicePort {
                 status
         );
     }
+
+    @Override
+    public OrderModel assignEmployee(Long id, OrderModel updateFields) {
+        if (updateFields.getEmployeeId() == null) {
+            throw new WrongArgumentException(DomainConstants.EMPLOYEE_ID_MANDATORY);
+        }
+
+        Long employeeIdFromToken = jwtUtil.getEmployeeIdFromSecurityContext();
+        if (!updateFields.getEmployeeId().equals(employeeIdFromToken)) {
+            throw new UnauthorizedException(DomainConstants.NOT_ALLOWED_TO_ASSIGN_ORDERS);
+        }
+
+        OrderModel existingOrder = orderPersistencePort.getById(id);
+        if (existingOrder == null) {
+            throw new WrongArgumentException(DomainConstants.ORDER_NOT_FOUND);
+        }
+
+        restaurantPersistencePort
+                .findById(existingOrder.getRestaurantId())
+                .orElseThrow(() -> new WrongArgumentException(
+                        DomainConstants.NON_EXISTING_RESTAURANT
+                ));
+
+        Long restaurantIdFromToken = jwtUtil.getRestaurantIdFromSecurityContext();
+        if (restaurantIdFromToken == null
+                || !restaurantIdFromToken.equals(existingOrder.getRestaurantId())) {
+            throw new UnauthorizedException(
+                    DomainConstants.NOT_ALLOWED_TO_CHECK_OTHER_RESTAURANTS_ORDERS
+            );
+        }
+
+        if (existingOrder.getStatus() != OrderStatus.PENDIENTE) {
+            throw new IllegalStateException(DomainConstants.ORDER_NOT_PENDING);
+        }
+
+        existingOrder.setEmployeeId(updateFields.getEmployeeId());
+        existingOrder.setStatus(OrderStatus.EN_PREPARACION);
+
+        orderPersistencePort.assignOrder(id, existingOrder);
+        return existingOrder;
+    }
+
 }
+

@@ -8,13 +8,16 @@ public class OrderModel {
     private Long restaurantId;
     private OrderStatus status;
     private List<OrderItemModel> items;
+    private Long employeeId;
 
-    public OrderModel(Long id, Long clientId, Long restaurantId, OrderStatus status, List<OrderItemModel> items) {
+    public OrderModel(Long id, Long clientId, Long restaurantId, OrderStatus status, List<OrderItemModel> items,
+                      Long employeeId) {
         setId(id);
         setClientId(clientId);
         setRestaurantId(restaurantId);
         setStatus(status);
         setItems(items);
+        this.employeeId = employeeId;
     }
 
     public Long getId() {
@@ -55,6 +58,14 @@ public class OrderModel {
 
     public void setItems(List<OrderItemModel> items) {
         this.items = items;
+    }
+
+    public Long getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
     }
 }
 

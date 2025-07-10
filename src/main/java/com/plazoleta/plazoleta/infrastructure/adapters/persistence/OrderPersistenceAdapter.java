@@ -4,6 +4,7 @@ import com.plazoleta.plazoleta.domain.models.OrderItemModel;
 import com.plazoleta.plazoleta.domain.models.OrderModel;
 import com.plazoleta.plazoleta.domain.models.OrderStatus;
 import com.plazoleta.plazoleta.domain.ports.out.OrderPersistencePort;
+import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import com.plazoleta.plazoleta.infrastructure.entities.DishEntity;
 import com.plazoleta.plazoleta.infrastructure.entities.OrderEntity;
@@ -14,6 +15,7 @@ import com.plazoleta.plazoleta.infrastructure.mappers.OrderItemEntityMapper;
 import com.plazoleta.plazoleta.infrastructure.repositories.mysql.DishRepository;
 import com.plazoleta.plazoleta.infrastructure.repositories.mysql.OrderRepository;
 import com.plazoleta.plazoleta.infrastructure.repositories.mysql.RestaurantRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -98,6 +100,22 @@ public class OrderPersistenceAdapter implements OrderPersistencePort {
                 pageEnt.getTotalElements()
         );
     }
+
+    @Override
+    public void assignOrder(Long id, OrderModel orderModel) {
+        OrderEntity existingOrder = orderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(DomainConstants.ORDER_NOT_FOUND + id));
+
+        existingOrder.assignEmployee(orderModel.getEmployeeId());
+        orderRepository.save(existingOrder);
+    }
+
+
+    @Override
+    public OrderModel getById(Long id) {
+        OrderEntity orderEntity = orderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(DomainConstants.ORDER_NOT_FOUND + id));
+        return orderEntityMapper.entityToModel(orderEntity);    }
 }
 
 

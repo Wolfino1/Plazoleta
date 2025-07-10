@@ -11,4 +11,5 @@ public interface OrderServicePort {
                                                int size,
                                                Long clientId,
                                                OrderStatus status);
+    OrderModel assignEmployee(Long id, OrderModel updateFields);
 }

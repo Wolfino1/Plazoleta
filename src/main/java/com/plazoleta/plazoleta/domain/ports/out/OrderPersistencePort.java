@@ -1,5 +1,6 @@
 package com.plazoleta.plazoleta.domain.ports.out;
 
+import com.plazoleta.plazoleta.domain.models.DishModel;
 import com.plazoleta.plazoleta.domain.models.OrderModel;
 import com.plazoleta.plazoleta.domain.models.OrderStatus;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
@@ -14,4 +15,7 @@ public interface OrderPersistencePort {
                                                int size,
                                                Long clientId,
                                                OrderStatus status);
+    void assignOrder(Long id, OrderModel orderModel);
+    OrderModel getById(Long id);
+
 }

@@ -35,5 +35,11 @@ import static jakarta.persistence.FetchType.LAZY;
                 orphanRemoval = true
         )
         private List<OrderItemEntity> items = new ArrayList<>();
+        private Long employeeId;
+
+        public void assignEmployee(Long employeeId) {
+            this.employeeId = employeeId;
+            this.status     = OrderStatus.EN_PREPARACION;
+        }
     }
 

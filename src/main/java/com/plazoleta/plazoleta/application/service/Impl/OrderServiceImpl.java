@@ -1,9 +1,8 @@
 package com.plazoleta.plazoleta.application.service.Impl;
 
+import com.plazoleta.plazoleta.application.dto.request.AssignEmployeeToOrderRequest;
 import com.plazoleta.plazoleta.application.dto.request.SaveOrderRequest;
-import com.plazoleta.plazoleta.application.dto.response.OrderItemResponse;
-import com.plazoleta.plazoleta.application.dto.response.OrderResponse;
-import com.plazoleta.plazoleta.application.dto.response.SaveOrderResponse;
+import com.plazoleta.plazoleta.application.dto.response.*;
 import com.plazoleta.plazoleta.application.mappers.OrderDtoMapper;
 import com.plazoleta.plazoleta.application.service.OrderService;
 import com.plazoleta.plazoleta.common.configurations.util.Constants;
@@ -64,4 +63,17 @@ public class OrderServiceImpl implements OrderService {
                 orderPage.getTotalElements()
         );
     }
+
+    @Override
+    public AssignEmployeeToOrderResponse assignEmployeeToOrder(
+            Long id,
+            AssignEmployeeToOrderRequest request
+    ) {
+        OrderModel updateFields = orderDtoMapper.assignEmployeeRequestToModel(request);
+
+        OrderModel updated = orderServicePort.assignEmployee(id, updateFields);
+
+        return orderDtoMapper.modelToAssignEmployeeResponse(updated);
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.plazoleta.plazoleta.infrastructure.security;
 
 import com.plazoleta.plazoleta.domain.exceptions.UnauthorizedException;
+import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -58,6 +59,18 @@ public class JwtUtil {
         throw new UnauthorizedException("Principal inválido para extraer restaurante");
     }
 
+    public Long getEmployeeIdFromSecurityContext() {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        if (authentication == null || !(authentication.getPrincipal() instanceof Claims)) {
+            return null;
+        }
+
+        Claims claims = (Claims) authentication.getPrincipal();
+        return claims.get(DomainConstants.EMPLOYEE_ID, Long.class);
+    }
 
 
 }
