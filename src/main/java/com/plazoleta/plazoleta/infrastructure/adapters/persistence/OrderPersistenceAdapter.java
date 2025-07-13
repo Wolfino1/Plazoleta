@@ -49,13 +49,14 @@ public class OrderPersistenceAdapter implements OrderPersistencePort {
         orderEntity.setStatus(orderModel.getStatus());
 
         RestaurantEntity rest = restaurantRepository.findById(orderModel.getRestaurantId())
-                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+                .orElseThrow(() -> new RuntimeException(DomainConstants.NON_EXISTING_RESTAURANT));
         orderEntity.setRestaurant(rest);
+        orderEntity.setPhoneNumber(orderModel.getPhoneNumber());
 
         for (OrderItemModel itemModel : orderModel.getItems()) {
             OrderItemEntity itemEntity = itemMapper.modelToEntity(itemModel);
             DishEntity dish = dishRepository.findById(itemModel.getDishId())
-                    .orElseThrow(() -> new RuntimeException("Dish not found: " + itemModel.getDishId()));
+                    .orElseThrow(() -> new RuntimeException(DomainConstants.DISH_NOT_FOUND + itemModel.getDishId()));
             itemEntity.setDish(dish);
             itemEntity.setOrder(orderEntity);
             orderEntity.getItems().add(itemEntity);
@@ -110,6 +111,15 @@ public class OrderPersistenceAdapter implements OrderPersistencePort {
         orderRepository.save(existingOrder);
     }
 
+    @Override
+    public void changeOrderStatus(Long id, OrderModel orderModel) {
+        OrderEntity existingOrder = orderRepository.findById(id).
+                orElseThrow(() -> new EntityNotFoundException(DomainConstants.ORDER_NOT_FOUND + id));
+
+        existingOrder.setStatus(orderModel.getStatus());
+        orderRepository.save(existingOrder);
+    }
+
 
     @Override
     public OrderModel getById(Long id) {
@@ -117,6 +127,3 @@ public class OrderPersistenceAdapter implements OrderPersistencePort {
                 .orElseThrow(() -> new EntityNotFoundException(DomainConstants.ORDER_NOT_FOUND + id));
         return orderEntityMapper.entityToModel(orderEntity);    }
 }
-
-
-

@@ -40,7 +40,8 @@ public class DomainConstants {
     public static final String EMPLOYEE_ID_MANDATORY = "Employee Id can't be null";
     public static final String NOT_ALLOWED_TO_ASSIGN_ORDERS = "You can't assign orders to that employee";
     public static final String EMPLOYEE_ID = "employeeId";
-
-
-
+    public static final String ORDER_STATUS_MANDATORY = "Order status can't be null";
+    public static final String NOT_ALLOWED_TO_EDIT_ORDERS = "You can't edit this order";
+    public static final String ORDER_NOT_PREPARATION = "Order must be in preparation to be changed";
+    public static final String ORDER_STATUS_INVALID = "Order Status can be only changed to Listo";
 }

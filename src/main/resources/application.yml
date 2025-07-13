@@ -26,3 +26,6 @@ spring:
 jwt:
   secret: pPj7W5c8LsyP9+ldOwqQF/qEyzTV6WUJFSUgfsVOkXs=
   expiration: 3600000
+
+messaging:
+  base-url: http://localhost:8082/api/v1/notify

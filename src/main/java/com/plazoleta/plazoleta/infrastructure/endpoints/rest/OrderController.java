@@ -1,8 +1,10 @@
 package com.plazoleta.plazoleta.infrastructure.endpoints.rest;
 
 import com.plazoleta.plazoleta.application.dto.request.AssignEmployeeToOrderRequest;
+import com.plazoleta.plazoleta.application.dto.request.ChangeOrderStatusRequest;
 import com.plazoleta.plazoleta.application.dto.request.SaveOrderRequest;
 import com.plazoleta.plazoleta.application.dto.response.AssignEmployeeToOrderResponse;
+import com.plazoleta.plazoleta.application.dto.response.ChangeOrderStatusResponse;
 import com.plazoleta.plazoleta.application.dto.response.OrderResponse;
 import com.plazoleta.plazoleta.application.dto.response.SaveOrderResponse;
 import com.plazoleta.plazoleta.application.service.OrderService;
@@ -41,7 +43,9 @@ public class OrderController {
         SaveOrderRequest reqWithClient = new SaveOrderRequest(
                 clientId,
                 saveOrderRequest.restaurantId(),
+                saveOrderRequest.phoneNumber(),
                 saveOrderRequest.items()
+
         );
 
         SaveOrderResponse response = orderService.save(reqWithClient);
@@ -58,12 +62,23 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByFilter(restaurantId, page, size, clientId, status));
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @PatchMapping("/{id}/assign")
     public ResponseEntity<AssignEmployeeToOrderResponse> assignEmployeeToOrder(
             @PathVariable Long id,
             @RequestBody AssignEmployeeToOrderRequest request
     ) {
         AssignEmployeeToOrderResponse response = orderService.assignEmployeeToOrder(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ChangeOrderStatusResponse> changeOrderStatus(
+            @PathVariable Long id,
+            @RequestBody ChangeOrderStatusRequest request
+    ) {
+        ChangeOrderStatusResponse response = orderService.changeOrderStatus(id, request);
         return ResponseEntity.ok(response);
     }
 

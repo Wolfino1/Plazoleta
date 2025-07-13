@@ -1,6 +1,7 @@
 package com.plazoleta.plazoleta.application.service.Impl;
 
 import com.plazoleta.plazoleta.application.dto.request.AssignEmployeeToOrderRequest;
+import com.plazoleta.plazoleta.application.dto.request.ChangeOrderStatusRequest;
 import com.plazoleta.plazoleta.application.dto.request.SaveOrderRequest;
 import com.plazoleta.plazoleta.application.dto.response.*;
 import com.plazoleta.plazoleta.application.mappers.OrderDtoMapper;
@@ -74,6 +75,15 @@ public class OrderServiceImpl implements OrderService {
         OrderModel updated = orderServicePort.assignEmployee(id, updateFields);
 
         return orderDtoMapper.modelToAssignEmployeeResponse(updated);
+    }
+
+    @Override
+    public ChangeOrderStatusResponse changeOrderStatus(Long id, ChangeOrderStatusRequest request) {
+        OrderModel updateStatus = orderDtoMapper.changeOrderStatusRequestToModel(request);
+
+        OrderModel updated = orderServicePort.changeStatus(id, updateStatus);
+
+        return orderDtoMapper.modelToChangeOrderResponse(updated);
     }
 
 }

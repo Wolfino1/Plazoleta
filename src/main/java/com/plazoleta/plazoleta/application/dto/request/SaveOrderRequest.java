@@ -4,5 +4,7 @@ import java.util.List;
 
 public record SaveOrderRequest(Long clientId,
                                Long restaurantId,
-                               List<SaveOrderItem> items) {
+                               String phoneNumber,
+                               List<SaveOrderItem> items
+                               ) {
 }

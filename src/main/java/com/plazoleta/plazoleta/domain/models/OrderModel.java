@@ -1,6 +1,7 @@
 package com.plazoleta.plazoleta.domain.models;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class OrderModel {
     private Long id;
@@ -9,15 +10,27 @@ public class OrderModel {
     private OrderStatus status;
     private List<OrderItemModel> items;
     private Long employeeId;
+    private Integer pinSecurity;
+    private String phoneNumber;
 
     public OrderModel(Long id, Long clientId, Long restaurantId, OrderStatus status, List<OrderItemModel> items,
-                      Long employeeId) {
+                      Long employeeId, String phoneNumber) {
         setId(id);
         setClientId(clientId);
         setRestaurantId(restaurantId);
         setStatus(status);
         setItems(items);
         this.employeeId = employeeId;
+        setPinSecurity();
+        setPhoneNumber(phoneNumber);
+    }
+
+    public Integer getPinSecurity() {
+        return pinSecurity;
+    }
+
+    public void setPinSecurity() {
+        this.pinSecurity = ThreadLocalRandom.current().nextInt(1000, 10000);
     }
 
     public Long getId() {
@@ -66,6 +79,14 @@ public class OrderModel {
 
     public void setEmployeeId(Long employeeId) {
         this.employeeId = employeeId;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }
 

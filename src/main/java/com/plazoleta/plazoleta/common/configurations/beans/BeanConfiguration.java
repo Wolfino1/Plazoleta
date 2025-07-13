@@ -4,10 +4,7 @@ import com.plazoleta.plazoleta.domain.ports.in.CategoryServicePort;
 import com.plazoleta.plazoleta.domain.ports.in.DishServicePort;
 import com.plazoleta.plazoleta.domain.ports.in.OrderServicePort;
 import com.plazoleta.plazoleta.domain.ports.in.RestaurantServicePort;
-import com.plazoleta.plazoleta.domain.ports.out.CategoryPersistencePort;
-import com.plazoleta.plazoleta.domain.ports.out.DishPersistencePort;
-import com.plazoleta.plazoleta.domain.ports.out.OrderPersistencePort;
-import com.plazoleta.plazoleta.domain.ports.out.RestaurantPersistencePort;
+import com.plazoleta.plazoleta.domain.ports.out.*;
 import com.plazoleta.plazoleta.domain.usecases.CategoryUseCase;
 import com.plazoleta.plazoleta.domain.usecases.DishUseCase;
 import com.plazoleta.plazoleta.domain.usecases.OrderUseCase;
@@ -58,6 +55,7 @@ public class BeanConfiguration {
     private final OrderEntityMapper orderEntityMapper;
     private final CategoryRepository categoryRepository;
     private final CategoryEntityMapper categoryEntityMapper;
+    private final NotificationClientPort notificationClient;
 
     @Bean
     public RestaurantServicePort restaurantServicePort() {
@@ -89,7 +87,8 @@ public class BeanConfiguration {
 
     @Bean
     public OrderServicePort orderServicePort() {
-        return new OrderUseCase(orderPersistencePort(),dishPersistencePort(),restaurantPersistencePort(),jwtUtil);
+        return new OrderUseCase(orderPersistencePort(),dishPersistencePort(),restaurantPersistencePort(),jwtUtil,
+                notificationClient);
     }
 
     @Bean
@@ -128,8 +127,12 @@ public class BeanConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/restaurant/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/dish/**").hasRole("OWNER")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/restaurants/get").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/order/**").hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/order/").hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/order/restaurants/{restaurantId}/orders").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/order/{id}/assign").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/order/{id}/status").hasRole("EMPLOYEE")
+
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(),

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -36,6 +37,18 @@ import static jakarta.persistence.FetchType.LAZY;
         )
         private List<OrderItemEntity> items = new ArrayList<>();
         private Long employeeId;
+
+        @Column(name = "phone_number", nullable = false, length = 13)
+        private String phoneNumber;
+
+
+        @Column(name = "pin_security", nullable = false)
+        private Integer pinSecurity;
+
+        @PrePersist
+        private void generatePinSecurity() {
+            this.pinSecurity = ThreadLocalRandom.current().nextInt(1000, 10000);
+        }
 
         public void assignEmployee(Long employeeId) {
             this.employeeId = employeeId;
