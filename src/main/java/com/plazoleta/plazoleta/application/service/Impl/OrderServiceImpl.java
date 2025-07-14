@@ -1,8 +1,6 @@
 package com.plazoleta.plazoleta.application.service.Impl;
 
-import com.plazoleta.plazoleta.application.dto.request.AssignEmployeeToOrderRequest;
-import com.plazoleta.plazoleta.application.dto.request.ChangeOrderStatusRequest;
-import com.plazoleta.plazoleta.application.dto.request.SaveOrderRequest;
+import com.plazoleta.plazoleta.application.dto.request.*;
 import com.plazoleta.plazoleta.application.dto.response.*;
 import com.plazoleta.plazoleta.application.mappers.OrderDtoMapper;
 import com.plazoleta.plazoleta.application.service.OrderService;
@@ -12,7 +10,10 @@ import com.plazoleta.plazoleta.domain.models.OrderModel;
 import com.plazoleta.plazoleta.domain.models.OrderStatus;
 import com.plazoleta.plazoleta.domain.ports.in.OrderServicePort;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.query.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderServicePort orderServicePort;
     private final OrderDtoMapper orderDtoMapper;
+    private final HttpServletRequest httpRequest;
 
     @Override
     public SaveOrderResponse save(SaveOrderRequest request) {
@@ -80,10 +82,23 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ChangeOrderStatusResponse changeOrderStatus(Long id, ChangeOrderStatusRequest request) {
         OrderModel updateStatus = orderDtoMapper.changeOrderStatusRequestToModel(request);
-
         OrderModel updated = orderServicePort.changeStatus(id, updateStatus);
-
         return orderDtoMapper.modelToChangeOrderResponse(updated);
     }
 
+    @Override
+    public SaveCompleteOrderResponse completeOrderStatus(Long id, CompleteOrderRequest request) {
+        Integer pin = request.pinSecurity();
+        OrderModel completed = orderServicePort.completeOrder(id, pin);
+        return orderDtoMapper.modelToSaveCompleteOrderResponse(completed);
+    }
+
+    @Override
+    public CancelOrderResponse cancelOrder(Long id, CancelOrderRequest request) {
+        OrderModel cancelOrder = orderDtoMapper.cancelOrder(request);
+        OrderModel canceled = orderServicePort.cancelOrder (id, cancelOrder);
+        return orderDtoMapper.modelToCancelOrderResponse (canceled);
+
+
+    }
 }

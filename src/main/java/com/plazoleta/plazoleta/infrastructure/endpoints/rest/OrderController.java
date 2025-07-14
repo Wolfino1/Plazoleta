@@ -1,12 +1,7 @@
 package com.plazoleta.plazoleta.infrastructure.endpoints.rest;
 
-import com.plazoleta.plazoleta.application.dto.request.AssignEmployeeToOrderRequest;
-import com.plazoleta.plazoleta.application.dto.request.ChangeOrderStatusRequest;
-import com.plazoleta.plazoleta.application.dto.request.SaveOrderRequest;
-import com.plazoleta.plazoleta.application.dto.response.AssignEmployeeToOrderResponse;
-import com.plazoleta.plazoleta.application.dto.response.ChangeOrderStatusResponse;
-import com.plazoleta.plazoleta.application.dto.response.OrderResponse;
-import com.plazoleta.plazoleta.application.dto.response.SaveOrderResponse;
+import com.plazoleta.plazoleta.application.dto.request.*;
+import com.plazoleta.plazoleta.application.dto.response.*;
 import com.plazoleta.plazoleta.application.service.OrderService;
 import com.plazoleta.plazoleta.domain.models.OrderStatus;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
@@ -82,6 +77,25 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<SaveCompleteOrderResponse> completeOrder(
+            @PathVariable Long id,
+            @RequestBody CompleteOrderRequest request
+    ) {
+        SaveCompleteOrderResponse response = orderService.completeOrderStatus(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<CancelOrderResponse> cancelOrder(
+            @PathVariable Long id,
+            CancelOrderRequest request
+    ) {
+        CancelOrderResponse response = orderService.cancelOrder(id, request);
+        return ResponseEntity.ok(response);
+    }
 
 }
 

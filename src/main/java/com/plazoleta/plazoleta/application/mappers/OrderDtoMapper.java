@@ -1,12 +1,7 @@
 package com.plazoleta.plazoleta.application.mappers;
 
-import com.plazoleta.plazoleta.application.dto.request.AssignEmployeeToOrderRequest;
-import com.plazoleta.plazoleta.application.dto.request.ChangeOrderStatusRequest;
-import com.plazoleta.plazoleta.application.dto.request.SaveOrderRequest;
-import com.plazoleta.plazoleta.application.dto.request.UpdateDishStatusRequest;
-import com.plazoleta.plazoleta.application.dto.response.AssignEmployeeToOrderResponse;
-import com.plazoleta.plazoleta.application.dto.response.ChangeOrderStatusResponse;
-import com.plazoleta.plazoleta.application.dto.response.OrderResponse;
+import com.plazoleta.plazoleta.application.dto.request.*;
+import com.plazoleta.plazoleta.application.dto.response.*;
 import com.plazoleta.plazoleta.domain.models.DishModel;
 import com.plazoleta.plazoleta.domain.models.OrderItemModel;
 import com.plazoleta.plazoleta.domain.models.OrderModel;
@@ -25,6 +20,9 @@ public interface OrderDtoMapper {
     OrderModel assignEmployeeRequestToModel(AssignEmployeeToOrderRequest request);
     OrderModel changeOrderStatusRequestToModel (ChangeOrderStatusRequest request);
     ChangeOrderStatusResponse modelToChangeOrderResponse (OrderModel orderModel);
+    SaveCompleteOrderResponse modelToSaveCompleteOrderResponse (OrderModel orderModel);
+    OrderModel cancelOrder (CancelOrderRequest request);
+    CancelOrderResponse modelToCancelOrderResponse (OrderModel orderModel);
 }
 
 

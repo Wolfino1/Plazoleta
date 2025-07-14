@@ -4,10 +4,7 @@ package com.plazoleta.plazoleta.domain.usecases;
 import com.plazoleta.plazoleta.domain.exceptions.*;
 import com.plazoleta.plazoleta.domain.models.*;
 import com.plazoleta.plazoleta.domain.ports.in.OrderServicePort;
-import com.plazoleta.plazoleta.domain.ports.out.DishPersistencePort;
-import com.plazoleta.plazoleta.domain.ports.out.NotificationClientPort;
-import com.plazoleta.plazoleta.domain.ports.out.OrderPersistencePort;
-import com.plazoleta.plazoleta.domain.ports.out.RestaurantPersistencePort;
+import com.plazoleta.plazoleta.domain.ports.out.*;
 import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import com.plazoleta.plazoleta.infrastructure.security.JwtUtil;
@@ -28,7 +25,6 @@ public class OrderUseCase implements OrderServicePort {
     private final RestaurantPersistencePort restaurantPersistencePort;
     private final JwtUtil jwtUtil;
     private final NotificationClientPort notificationClient;
-
 
     @Override
     public void save(OrderModel orderModel) {
@@ -72,7 +68,6 @@ public class OrderUseCase implements OrderServicePort {
         if (!phone.matches(phoneRegex)) {
             throw new WrongArgumentException(DomainConstants.WRONG_ARGUMENT_PHONE_MESSAGE);
         }
-
 
         orderModel.setStatus(OrderStatus.PENDIENTE);
         orderPersistencePort.save(orderModel);
@@ -184,6 +179,67 @@ public class OrderUseCase implements OrderServicePort {
         );
             return existingOrder;
         }
+
+    @Override
+    public OrderModel completeOrder(Long orderId, Integer pinSecurity) {
+        OrderModel existingOrder = orderPersistencePort.getById(orderId);
+        if (existingOrder == null) {
+            throw new WrongArgumentException(DomainConstants.ORDER_NOT_FOUND);
+        }
+        if (pinSecurity == null) {
+            throw new WrongArgumentException(DomainConstants.ORDER_PIN_MANDATORY);
+        }
+        Long employeeId = jwtUtil.getEmployeeIdFromSecurityContext();
+        if (!existingOrder.getEmployeeId().equals(employeeId)) {
+            throw new UnauthorizedException(DomainConstants.NOT_ALLOWED_TO_EDIT_ORDERS);
+        }
+
+        if (existingOrder.getStatus() == OrderStatus.ENTREGADO) {
+            throw new IllegalStateException(DomainConstants.ORDER_ALREADY_COMPLETED);
+        }
+        if (existingOrder.getStatus() != OrderStatus.LISTO) {
+            throw new IllegalStateException(DomainConstants.ORDER_NOT_READY);
+        }
+
+        if (!existingOrder.getPinSecurity().equals(pinSecurity)) {
+            throw new WrongArgumentException(DomainConstants.INVALID_SECURITY_PIN);
+        }
+
+        existingOrder.setStatus(OrderStatus.ENTREGADO);
+        orderPersistencePort.changeOrderStatus(orderId, existingOrder);
+        return existingOrder;
     }
+
+    @Override
+    public OrderModel cancelOrder(Long id, OrderModel cancelOrder) {
+
+        OrderModel orderCanceled = orderPersistencePort.getById(id);
+
+        if (orderCanceled.getStatus() == null) {
+            throw new WrongArgumentException(DomainConstants.ORDER_STATUS_MANDATORY);
+        }
+
+        if (orderCanceled.getStatus() != OrderStatus.PENDIENTE) {
+            throw new WrongArgumentException(DomainConstants.ORDER_STATUS_NO_VALID);
+        }
+
+        Long clientIdFromToken = jwtUtil.getClientIdFromSecurityContext();
+
+        OrderModel existingOrder = orderPersistencePort.getById(id);
+
+        if (existingOrder == null) {
+            throw new WrongArgumentException(DomainConstants.ORDER_NOT_FOUND);
+        }
+
+        if (!existingOrder.getClientId().equals(clientIdFromToken)) {
+            throw new UnauthorizedException(DomainConstants.NOT_ALLOWED_TO_EDIT_ORDERS);
+        }
+
+        existingOrder.setStatus(OrderStatus.CANCELADO);
+        orderPersistencePort.changeOrderStatus(id, existingOrder);
+        return existingOrder;
+    }
+}
+
 
 

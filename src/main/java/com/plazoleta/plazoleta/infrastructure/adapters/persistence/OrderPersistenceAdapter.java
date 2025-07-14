@@ -1,11 +1,14 @@
 package com.plazoleta.plazoleta.infrastructure.adapters.persistence;
 
+import com.plazoleta.plazoleta.domain.exceptions.WrongArgumentException;
 import com.plazoleta.plazoleta.domain.models.OrderItemModel;
 import com.plazoleta.plazoleta.domain.models.OrderModel;
 import com.plazoleta.plazoleta.domain.models.OrderStatus;
 import com.plazoleta.plazoleta.domain.ports.out.OrderPersistencePort;
+import com.plazoleta.plazoleta.domain.ports.out.TraceabilityClientPort;
 import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
+import com.plazoleta.plazoleta.infrastructure.client.dto.CreateTraceabilityRequest;
 import com.plazoleta.plazoleta.infrastructure.entities.DishEntity;
 import com.plazoleta.plazoleta.infrastructure.entities.OrderEntity;
 import com.plazoleta.plazoleta.infrastructure.entities.OrderItemEntity;
@@ -34,6 +37,7 @@ public class OrderPersistenceAdapter implements OrderPersistencePort {
     private final RestaurantRepository  restaurantRepository;
     private final DishRepository dishRepository;
     private final OrderItemEntityMapper itemMapper;
+    private final TraceabilityClientPort traceabilityClientPort;
     private final OrderEntityMapper orderEntityMapper;
 
 
@@ -119,7 +123,6 @@ public class OrderPersistenceAdapter implements OrderPersistencePort {
         existingOrder.setStatus(orderModel.getStatus());
         orderRepository.save(existingOrder);
     }
-
 
     @Override
     public OrderModel getById(Long id) {

@@ -72,6 +72,17 @@ public class JwtUtil {
         return claims.get(DomainConstants.EMPLOYEE_ID, Long.class);
     }
 
+    public Long getClientIdFromSecurityContext() {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
 
+        if (authentication == null || !(authentication.getPrincipal() instanceof Claims)) {
+            return null;
+        }
+
+        Claims claims = (Claims) authentication.getPrincipal();
+        return claims.get(DomainConstants.CLIENT_ID, Long.class);
+    }
 }
 

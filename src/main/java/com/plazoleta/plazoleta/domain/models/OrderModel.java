@@ -14,23 +14,19 @@ public class OrderModel {
     private String phoneNumber;
 
     public OrderModel(Long id, Long clientId, Long restaurantId, OrderStatus status, List<OrderItemModel> items,
-                      Long employeeId, String phoneNumber) {
+                      Long employeeId, Integer pinSecurity, String phoneNumber) {
         setId(id);
         setClientId(clientId);
         setRestaurantId(restaurantId);
         setStatus(status);
         setItems(items);
         this.employeeId = employeeId;
-        setPinSecurity();
+        this.pinSecurity = pinSecurity;
         setPhoneNumber(phoneNumber);
     }
 
     public Integer getPinSecurity() {
         return pinSecurity;
-    }
-
-    public void setPinSecurity() {
-        this.pinSecurity = ThreadLocalRandom.current().nextInt(1000, 10000);
     }
 
     public Long getId() {

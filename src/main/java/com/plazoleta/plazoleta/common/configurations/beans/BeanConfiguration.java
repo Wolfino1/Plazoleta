@@ -36,9 +36,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.client.RestTemplate;
-
-import java.time.Duration;
 
 @Configuration
 @RequiredArgsConstructor
@@ -56,6 +53,8 @@ public class BeanConfiguration {
     private final CategoryRepository categoryRepository;
     private final CategoryEntityMapper categoryEntityMapper;
     private final NotificationClientPort notificationClient;
+    private final TraceabilityClientPort traceabilityClientPort;
+
 
     @Bean
     public RestaurantServicePort restaurantServicePort() {
@@ -94,7 +93,7 @@ public class BeanConfiguration {
     @Bean
     public OrderPersistencePort orderPersistencePort() {
         return new OrderPersistenceAdapter(orderRepository, restaurantRepository, dishRepository, itemMapper,
-                orderEntityMapper);
+                traceabilityClientPort, orderEntityMapper);
     }
 
     @Bean
@@ -107,7 +106,8 @@ public class BeanConfiguration {
     public SecurityFilterChain publicApiChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/v1/restaurant/get",
-                        "/api/v1/dish/{restaurantId}/dishes"
+                        "/api/v1/dish/{restaurantId}/dishes",
+                        "/api/v1/trazabilidad/**"
                 )
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())

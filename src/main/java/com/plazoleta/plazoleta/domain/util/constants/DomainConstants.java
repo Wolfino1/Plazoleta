@@ -40,8 +40,16 @@ public class DomainConstants {
     public static final String EMPLOYEE_ID_MANDATORY = "Employee Id can't be null";
     public static final String NOT_ALLOWED_TO_ASSIGN_ORDERS = "You can't assign orders to that employee";
     public static final String EMPLOYEE_ID = "employeeId";
+    public static final String CLIENT_ID = "clientId";
     public static final String ORDER_STATUS_MANDATORY = "Order status can't be null";
     public static final String NOT_ALLOWED_TO_EDIT_ORDERS = "You can't edit this order";
     public static final String ORDER_NOT_PREPARATION = "Order must be in preparation to be changed";
     public static final String ORDER_STATUS_INVALID = "Order Status can be only changed to Listo";
+    public static final String ORDER_ALREADY_COMPLETED = "Order is already completed";
+    public static final String ORDER_NOT_READY = "Order is not ready";
+    public static final String INVALID_SECURITY_PIN = "INVALID SECURITY PIN";
+    public static final String ORDER_PIN_MANDATORY = "Security pin is mandatory";
+    public static final String ORDER_STATUS_NO_VALID = "Your order is being prepared or ready and can't be canceled now";
+
+
 }
