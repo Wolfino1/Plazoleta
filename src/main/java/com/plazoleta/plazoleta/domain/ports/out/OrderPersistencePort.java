@@ -18,5 +18,5 @@ public interface OrderPersistencePort {
     void assignOrder(Long id, OrderModel orderModel);
     void changeOrderStatus (Long id, OrderModel orderModel);
     OrderModel getById(Long id);
-
+    OrderModel getUserById(Long id);
 }

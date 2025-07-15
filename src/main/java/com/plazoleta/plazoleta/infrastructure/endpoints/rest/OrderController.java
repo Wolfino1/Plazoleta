@@ -3,6 +3,7 @@ package com.plazoleta.plazoleta.infrastructure.endpoints.rest;
 import com.plazoleta.plazoleta.application.dto.request.*;
 import com.plazoleta.plazoleta.application.dto.response.*;
 import com.plazoleta.plazoleta.application.service.OrderService;
+import com.plazoleta.plazoleta.domain.models.OrderModel;
 import com.plazoleta.plazoleta.domain.models.OrderStatus;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import io.jsonwebtoken.Claims;
@@ -13,7 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestHeader;
+
 
 
 @RestController
@@ -49,11 +53,11 @@ public class OrderController {
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     @GetMapping("/restaurants/{restaurantId}/orders")
-    public ResponseEntity<PagedResult<OrderResponse>> getOrdersByFilter   (@PathVariable Long restaurantId,
-                                                                           @RequestParam(defaultValue = "0") int page,
-                                                                           @RequestParam(defaultValue = "10") int size,
-                                                                           @RequestParam(required = false) Long clientId,
-                                                                           @RequestParam(required = false) OrderStatus status) {
+    public ResponseEntity<PagedResult<OrderResponse>> getOrdersByFilter(@PathVariable Long restaurantId,
+                                                                        @RequestParam(defaultValue = "0") int page,
+                                                                        @RequestParam(defaultValue = "10") int size,
+                                                                        @RequestParam(required = false) Long clientId,
+                                                                        @RequestParam(required = false) OrderStatus status) {
         return ResponseEntity.ok(orderService.getOrdersByFilter(restaurantId, page, size, clientId, status));
     }
 
@@ -61,9 +65,10 @@ public class OrderController {
     @PatchMapping("/{id}/assign")
     public ResponseEntity<AssignEmployeeToOrderResponse> assignEmployeeToOrder(
             @PathVariable Long id,
-            @RequestBody AssignEmployeeToOrderRequest request
+            @RequestBody AssignEmployeeToOrderRequest request,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
     ) {
-        AssignEmployeeToOrderResponse response = orderService.assignEmployeeToOrder(id, request);
+        AssignEmployeeToOrderResponse response = orderService.assignEmployeeToOrder(id, request, authHeader);
         return ResponseEntity.ok(response);
     }
 
@@ -71,9 +76,11 @@ public class OrderController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<ChangeOrderStatusResponse> changeOrderStatus(
             @PathVariable Long id,
-            @RequestBody ChangeOrderStatusRequest request
+            @RequestBody ChangeOrderStatusRequest request,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+
     ) {
-        ChangeOrderStatusResponse response = orderService.changeOrderStatus(id, request);
+        ChangeOrderStatusResponse response = orderService.changeOrderStatus(id, request, authHeader);
         return ResponseEntity.ok(response);
     }
 
@@ -81,9 +88,11 @@ public class OrderController {
     @PatchMapping("/{id}/complete")
     public ResponseEntity<SaveCompleteOrderResponse> completeOrder(
             @PathVariable Long id,
-            @RequestBody CompleteOrderRequest request
+            @RequestBody CompleteOrderRequest request,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+
     ) {
-        SaveCompleteOrderResponse response = orderService.completeOrderStatus(id, request);
+        SaveCompleteOrderResponse response = orderService.completeOrderStatus(id, request, authHeader);
         return ResponseEntity.ok(response);
     }
 
@@ -91,11 +100,23 @@ public class OrderController {
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<CancelOrderResponse> cancelOrder(
             @PathVariable Long id,
-            CancelOrderRequest request
+            CancelOrderRequest request,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+
     ) {
-        CancelOrderResponse response = orderService.cancelOrder(id, request);
+        CancelOrderResponse response = orderService.cancelOrder(id, request, authHeader);
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderByIdResponse> getById(@PathVariable Long id) {
+
+        OrderModel order = orderService.getOrderById(id);
+        OrderByIdResponse resp = new OrderByIdResponse(order.getId(), order.getClientId(),
+                order.getStatus(), order.getEmployeeId());
+        return ResponseEntity.ok(resp);
+    }
 }
+
 

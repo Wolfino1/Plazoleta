@@ -5,7 +5,6 @@ import com.plazoleta.plazoleta.domain.models.OrderStatus;
 import java.time.LocalDateTime;
 
 public record CreateTraceabilityRequest(
-        Long restaurantId,
         Long orderId,
         Long clientId,
         String clientEmail,

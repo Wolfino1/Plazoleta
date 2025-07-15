@@ -13,8 +13,10 @@ public interface OrderServicePort {
                                                int size,
                                                Long clientId,
                                                OrderStatus status);
-    OrderModel assignEmployee(Long id, OrderModel updateFields);
-    OrderModel changeStatus (Long id, OrderModel updateStatus);
-    OrderModel completeOrder(Long orderId, Integer pinSecurity);
-    OrderModel cancelOrder (Long id, OrderModel cancelOrder);
+    OrderModel assignEmployee(Long id, OrderModel updateFields, String authHeader);
+    OrderModel changeStatus (Long id, OrderModel updateStatus, String authHeader);
+    OrderModel completeOrder(Long orderId, Integer pinSecurity, String authHeader);
+    OrderModel cancelOrder (Long id, OrderModel cancelOrder, String authHeader);
+    OrderModel getOrderById(Long id);
+
 }

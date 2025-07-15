@@ -56,6 +56,7 @@ public class BeanConfiguration {
     private final TraceabilityClientPort traceabilityClientPort;
 
 
+
     @Bean
     public RestaurantServicePort restaurantServicePort() {
         return new RestaurantUseCase(restaurantPersistencePort());
@@ -87,7 +88,7 @@ public class BeanConfiguration {
     @Bean
     public OrderServicePort orderServicePort() {
         return new OrderUseCase(orderPersistencePort(),dishPersistencePort(),restaurantPersistencePort(),jwtUtil,
-                notificationClient);
+                notificationClient,traceabilityClientPort);
     }
 
     @Bean
@@ -131,6 +132,8 @@ public class BeanConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/v1/order/restaurants/{restaurantId}/orders").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/order/{id}/assign").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/order/{id}/status").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/order/{id}").hasRole("EMPLOYEE")
+
 
 
                         .anyRequest().authenticated()
