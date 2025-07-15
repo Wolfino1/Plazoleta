@@ -68,37 +68,37 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public AssignEmployeeToOrderResponse assignEmployeeToOrder(
-            Long id,
-            AssignEmployeeToOrderRequest request
-    ) {
+    public AssignEmployeeToOrderResponse assignEmployeeToOrder(Long id, AssignEmployeeToOrderRequest request, String authHeader) {
         OrderModel updateFields = orderDtoMapper.assignEmployeeRequestToModel(request);
-
-        OrderModel updated = orderServicePort.assignEmployee(id, updateFields);
-
+        OrderModel updated = orderServicePort.assignEmployee(id, updateFields, authHeader);
         return orderDtoMapper.modelToAssignEmployeeResponse(updated);
     }
 
     @Override
-    public ChangeOrderStatusResponse changeOrderStatus(Long id, ChangeOrderStatusRequest request) {
+    public ChangeOrderStatusResponse changeOrderStatus(Long id, ChangeOrderStatusRequest request, String authHeader) {
         OrderModel updateStatus = orderDtoMapper.changeOrderStatusRequestToModel(request);
-        OrderModel updated = orderServicePort.changeStatus(id, updateStatus);
+        OrderModel updated = orderServicePort.changeStatus(id, updateStatus, authHeader);
         return orderDtoMapper.modelToChangeOrderResponse(updated);
     }
 
     @Override
-    public SaveCompleteOrderResponse completeOrderStatus(Long id, CompleteOrderRequest request) {
+    public SaveCompleteOrderResponse completeOrderStatus(Long id, CompleteOrderRequest request, String authHeader) {
         Integer pin = request.pinSecurity();
-        OrderModel completed = orderServicePort.completeOrder(id, pin);
+        OrderModel completed = orderServicePort.completeOrder(id, pin, authHeader);
         return orderDtoMapper.modelToSaveCompleteOrderResponse(completed);
     }
 
     @Override
-    public CancelOrderResponse cancelOrder(Long id, CancelOrderRequest request) {
+    public CancelOrderResponse cancelOrder(Long id, CancelOrderRequest request, String authHeader) {
         OrderModel cancelOrder = orderDtoMapper.cancelOrder(request);
-        OrderModel canceled = orderServicePort.cancelOrder (id, cancelOrder);
+        OrderModel canceled = orderServicePort.cancelOrder (id, cancelOrder, authHeader);
         return orderDtoMapper.modelToCancelOrderResponse (canceled);
 
 
+    }
+
+    @Override
+    public OrderModel getOrderById(Long id) {
+        return orderServicePort.getOrderById(id);
     }
 }

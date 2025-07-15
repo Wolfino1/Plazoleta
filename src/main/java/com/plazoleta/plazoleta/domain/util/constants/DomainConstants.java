@@ -50,6 +50,7 @@ public class DomainConstants {
     public static final String INVALID_SECURITY_PIN = "INVALID SECURITY PIN";
     public static final String ORDER_PIN_MANDATORY = "Security pin is mandatory";
     public static final String ORDER_STATUS_NO_VALID = "Your order is being prepared or ready and can't be canceled now";
+    public static final String ORDER_CANT_NULL = "Order can't be null";
 
 
 }

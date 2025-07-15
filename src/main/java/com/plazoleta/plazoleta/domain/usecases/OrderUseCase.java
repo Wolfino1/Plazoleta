@@ -7,12 +7,14 @@ import com.plazoleta.plazoleta.domain.ports.in.OrderServicePort;
 import com.plazoleta.plazoleta.domain.ports.out.*;
 import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
+import com.plazoleta.plazoleta.infrastructure.client.dto.CreateTraceabilityRequest;
 import com.plazoleta.plazoleta.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.IllegalStateException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,6 +27,7 @@ public class OrderUseCase implements OrderServicePort {
     private final RestaurantPersistencePort restaurantPersistencePort;
     private final JwtUtil jwtUtil;
     private final NotificationClientPort notificationClient;
+    private final TraceabilityClientPort traceabilityClientPort;
 
     @Override
     public void save(OrderModel orderModel) {
@@ -96,49 +99,52 @@ public class OrderUseCase implements OrderServicePort {
     }
 
     @Override
-    public OrderModel assignEmployee(Long id, OrderModel updateFields) {
+    public OrderModel assignEmployee(Long id, OrderModel updateFields, String authHeader) {
         if (updateFields.getEmployeeId() == null) {
             throw new WrongArgumentException(DomainConstants.EMPLOYEE_ID_MANDATORY);
         }
-
         Long employeeIdFromToken = jwtUtil.getEmployeeIdFromSecurityContext();
         if (!updateFields.getEmployeeId().equals(employeeIdFromToken)) {
             throw new UnauthorizedException(DomainConstants.NOT_ALLOWED_TO_ASSIGN_ORDERS);
         }
-
-        OrderModel existingOrder = orderPersistencePort.getById(id);
-        if (existingOrder == null) {
+        OrderModel existing = orderPersistencePort.getById(id);
+        if (existing == null) {
             throw new WrongArgumentException(DomainConstants.ORDER_NOT_FOUND);
         }
-
-        restaurantPersistencePort
-                .findById(existingOrder.getRestaurantId())
-                .orElseThrow(() -> new WrongArgumentException(
-                        DomainConstants.NON_EXISTING_RESTAURANT
-                ));
-
+        restaurantPersistencePort.findById(existing.getRestaurantId())
+                .orElseThrow(() -> new WrongArgumentException(DomainConstants.NON_EXISTING_RESTAURANT));
         Long restaurantIdFromToken = jwtUtil.getRestaurantIdFromSecurityContext();
-        if (restaurantIdFromToken == null
-                || !restaurantIdFromToken.equals(existingOrder.getRestaurantId())) {
-            throw new UnauthorizedException(
-                    DomainConstants.NOT_ALLOWED_TO_CHECK_OTHER_RESTAURANTS_ORDERS
-            );
+        if (restaurantIdFromToken == null || !restaurantIdFromToken.equals(existing.getRestaurantId())) {
+            throw new UnauthorizedException(DomainConstants.NOT_ALLOWED_TO_CHECK_OTHER_RESTAURANTS_ORDERS);
         }
-
-        if (existingOrder.getStatus() != OrderStatus.PENDIENTE) {
+        if (existing.getStatus() != OrderStatus.PENDIENTE) {
             throw new IllegalStateException(DomainConstants.ORDER_NOT_PENDING);
         }
+        OrderStatus previousStatus = existing.getStatus(); // ANTES de cambiar nada
 
-        existingOrder.setEmployeeId(updateFields.getEmployeeId());
-        existingOrder.setStatus(OrderStatus.EN_PREPARACION);
+        existing.setEmployeeId(updateFields.getEmployeeId());
+        existing.setStatus(OrderStatus.EN_PREPARACION);
 
-        orderPersistencePort.assignOrder(id, existingOrder);
-        return existingOrder;
+        orderPersistencePort.assignOrder(id, existing);
+
+        CreateTraceabilityRequest traceReq = new CreateTraceabilityRequest(
+                existing.getId(),
+                existing.getClientId(),
+                null,
+                LocalDateTime.now(),
+                previousStatus,
+                existing.getStatus(),
+                existing.getEmployeeId(),
+                null
+        );
+
+        traceabilityClientPort.createTrace(traceReq, authHeader);
+
+        return existing;
     }
 
-
-    @Override
-    public OrderModel changeStatus(Long id, OrderModel updateStatus) {
+        @Override
+    public OrderModel changeStatus(Long id, OrderModel updateStatus, String authHeader) {
         if (updateStatus.getStatus() == null) {
             throw new WrongArgumentException(DomainConstants.ORDER_STATUS_MANDATORY);
         }
@@ -167,21 +173,36 @@ public class OrderUseCase implements OrderServicePort {
                 throw new IllegalStateException(DomainConstants.ORDER_NOT_PREPARATION);
             }
 
+            OrderStatus previousStatus = existingOrder.getStatus(); // Guardar antes de cambiar
+
             existingOrder.setStatus(updateStatus.getStatus());
             orderPersistencePort.changeOrderStatus(id, existingOrder);
 
-                notificationClient.notifyOrderReady(
-                existingOrder.getId(),
-                existingOrder.getClientId(),
-                existingOrder.getStatus().name(),
-                existingOrder.getPinSecurity(),
-                existingOrder.getPhoneNumber()
-        );
+            notificationClient.notifyOrderReady(
+                    existingOrder.getId(),
+                    existingOrder.getClientId(),
+                    existingOrder.getStatus().name(),
+                    existingOrder.getPinSecurity(),
+                    existingOrder.getPhoneNumber()
+            );
+
+            CreateTraceabilityRequest traceReq = new CreateTraceabilityRequest(
+                    existingOrder.getId(),
+                    existingOrder.getClientId(),
+                    null,
+                    LocalDateTime.now(),
+                    previousStatus,
+                    existingOrder.getStatus(),
+                    existingOrder.getEmployeeId(),
+                    null
+            );
+            traceabilityClientPort.createTrace(traceReq, authHeader);
+
             return existingOrder;
         }
 
     @Override
-    public OrderModel completeOrder(Long orderId, Integer pinSecurity) {
+    public OrderModel completeOrder(Long orderId, Integer pinSecurity, String authHeader) {
         OrderModel existingOrder = orderPersistencePort.getById(orderId);
         if (existingOrder == null) {
             throw new WrongArgumentException(DomainConstants.ORDER_NOT_FOUND);
@@ -205,13 +226,27 @@ public class OrderUseCase implements OrderServicePort {
             throw new WrongArgumentException(DomainConstants.INVALID_SECURITY_PIN);
         }
 
+        OrderStatus previousStatus = existingOrder.getStatus();
+
         existingOrder.setStatus(OrderStatus.ENTREGADO);
         orderPersistencePort.changeOrderStatus(orderId, existingOrder);
+
+        CreateTraceabilityRequest traceReq = new CreateTraceabilityRequest(
+                existingOrder.getId(),
+                existingOrder.getClientId(),
+                null,
+                LocalDateTime.now(),
+                previousStatus,
+                existingOrder.getStatus(),
+                existingOrder.getEmployeeId(),
+                null
+        );
+        traceabilityClientPort.createTrace(traceReq, authHeader);
         return existingOrder;
     }
 
     @Override
-    public OrderModel cancelOrder(Long id, OrderModel cancelOrder) {
+    public OrderModel cancelOrder(Long id, OrderModel cancelOrder, String authHeader) {
 
         OrderModel orderCanceled = orderPersistencePort.getById(id);
 
@@ -234,12 +269,33 @@ public class OrderUseCase implements OrderServicePort {
         if (!existingOrder.getClientId().equals(clientIdFromToken)) {
             throw new UnauthorizedException(DomainConstants.NOT_ALLOWED_TO_EDIT_ORDERS);
         }
+        OrderStatus previousStatus = existingOrder.getStatus();
 
         existingOrder.setStatus(OrderStatus.CANCELADO);
         orderPersistencePort.changeOrderStatus(id, existingOrder);
+        CreateTraceabilityRequest traceReq = new CreateTraceabilityRequest(
+                existingOrder.getId(),
+                existingOrder.getClientId(),
+                null,
+                LocalDateTime.now(),
+                previousStatus,
+                existingOrder.getStatus(),
+                existingOrder.getEmployeeId(),
+                null
+        );
+        traceabilityClientPort.createTrace(traceReq, authHeader);
         return existingOrder;
     }
+
+    @Override
+    public OrderModel getOrderById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException(DomainConstants.ORDER_CANT_NULL);
+        }
+        OrderModel order = orderPersistencePort.getUserById(id);
+        if (order == null) {
+            throw new RuntimeException(DomainConstants.ORDER_NOT_FOUND + id);
+        }
+        return order;
+    }
 }
-
-
-

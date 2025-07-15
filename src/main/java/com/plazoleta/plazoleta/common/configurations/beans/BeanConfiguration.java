@@ -21,7 +21,6 @@ import com.plazoleta.plazoleta.infrastructure.repositories.mysql.RestaurantRepos
 import com.plazoleta.plazoleta.infrastructure.security.JwtAuthenticationFilter;
 import com.plazoleta.plazoleta.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -56,6 +55,7 @@ public class BeanConfiguration {
     private final TraceabilityClientPort traceabilityClientPort;
 
 
+
     @Bean
     public RestaurantServicePort restaurantServicePort() {
         return new RestaurantUseCase(restaurantPersistencePort());
@@ -87,13 +87,13 @@ public class BeanConfiguration {
     @Bean
     public OrderServicePort orderServicePort() {
         return new OrderUseCase(orderPersistencePort(),dishPersistencePort(),restaurantPersistencePort(),jwtUtil,
-                notificationClient);
+                notificationClient,traceabilityClientPort);
     }
 
     @Bean
     public OrderPersistencePort orderPersistencePort() {
         return new OrderPersistenceAdapter(orderRepository, restaurantRepository, dishRepository, itemMapper,
-                traceabilityClientPort, orderEntityMapper);
+                orderEntityMapper);
     }
 
     @Bean
@@ -106,6 +106,7 @@ public class BeanConfiguration {
     public SecurityFilterChain publicApiChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/v1/restaurant/get",
+                        "/api/v1/restaurant/{id}",
                         "/api/v1/dish/{restaurantId}/dishes",
                         "/api/v1/trazabilidad/**"
                 )
@@ -128,9 +129,14 @@ public class BeanConfiguration {
                         .requestMatchers(HttpMethod.POST, "/api/v1/restaurant/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/dish/**").hasRole("OWNER")
                         .requestMatchers(HttpMethod.POST, "/api/v1/order/").hasRole("CLIENT")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/order/restaurants/{restaurantId}/orders").hasRole("EMPLOYEE")
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/order/restaurants/{restaurantId}/orders"
+                        ).hasAnyRole("EMPLOYEE","OWNER")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/order/{id}/assign").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/order/{id}/status").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/order/{id}").hasRole("EMPLOYEE")
+
 
 
                         .anyRequest().authenticated()
