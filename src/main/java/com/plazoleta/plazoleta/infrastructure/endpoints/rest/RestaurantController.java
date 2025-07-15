@@ -1,10 +1,9 @@
 package com.plazoleta.plazoleta.infrastructure.endpoints.rest;
 
 import com.plazoleta.plazoleta.application.dto.request.SaveRestaurantRequest;
-import com.plazoleta.plazoleta.application.dto.response.RestaurantResponse;
-import com.plazoleta.plazoleta.application.dto.response.SaveDishResponse;
-import com.plazoleta.plazoleta.application.dto.response.SaveRestaurantResponse;
+import com.plazoleta.plazoleta.application.dto.response.*;
 import com.plazoleta.plazoleta.application.service.RestaurantService;
+import com.plazoleta.plazoleta.domain.models.RestaurantModel;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -52,5 +51,13 @@ public class RestaurantController {
 
         return ResponseEntity.ok(restaurantService.getRestaurants(
                 page, size, id, name, ownerId ,logoUrl, sortBy ,orderAsc));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RestaurantByIdResponse> getById(@PathVariable Long id) {
+
+        RestaurantModel restaurant = restaurantService.getRestaurantById(id);
+        RestaurantByIdResponse resp = new RestaurantByIdResponse(restaurant.getId(), restaurant.getOwnerId());
+        return ResponseEntity.ok(resp);
     }
 }

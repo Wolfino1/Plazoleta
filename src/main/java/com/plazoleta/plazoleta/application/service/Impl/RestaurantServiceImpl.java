@@ -59,4 +59,9 @@ public class RestaurantServiceImpl implements RestaurantService {
 
         return pageMapper.fromPage(content, modelPage);
     }
+
+    @Override
+    public RestaurantModel getRestaurantById(Long id) {
+        return restaurantServicePort.getRestaurantById(id);
+    }
 }

@@ -2,6 +2,7 @@ package com.plazoleta.plazoleta.infrastructure.adapters.persistence;
 
 import com.plazoleta.plazoleta.domain.models.RestaurantModel;
 import com.plazoleta.plazoleta.domain.ports.out.RestaurantPersistencePort;
+import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import com.plazoleta.plazoleta.infrastructure.entities.RestaurantEntity;
 import com.plazoleta.plazoleta.infrastructure.mappers.RestaurantEntityMapper;
@@ -68,4 +69,10 @@ public class RestaurantPersistenceAdapter implements RestaurantPersistencePort {
                 .map(restaurantEntityMapper::entityToModel);
     }
 
+    @Override
+    public RestaurantModel getUserById(Long id) {
+        return restaurantRepository.findById(id)
+                .map(restaurantEntityMapper::entityToModel)
+                .orElseThrow(() -> new RuntimeException(DomainConstants.ORDER_NOT_FOUND + id));
+    }
 }

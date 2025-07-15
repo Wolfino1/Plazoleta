@@ -35,7 +35,6 @@ public class OrderPersistenceAdapter implements OrderPersistencePort {
     private final RestaurantRepository  restaurantRepository;
     private final DishRepository dishRepository;
     private final OrderItemEntityMapper itemMapper;
-    private final TraceabilityClientPort traceabilityClientPort;
     private final OrderEntityMapper orderEntityMapper;
 
 

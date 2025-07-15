@@ -51,7 +51,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE','OWNER')")
     @GetMapping("/restaurants/{restaurantId}/orders")
     public ResponseEntity<PagedResult<OrderResponse>> getOrdersByFilter(@PathVariable Long restaurantId,
                                                                         @RequestParam(defaultValue = "0") int page,
