@@ -47,6 +47,7 @@ public class DomainConstants {
     public static final String ORDER_STATUS_INVALID = "Order Status can be only changed to Listo";
     public static final String ORDER_ALREADY_COMPLETED = "Order is already completed";
     public static final String ORDER_NOT_READY = "Order is not ready";
+    public static final String ORDER_CANCELED = "Order is canceled";
     public static final String INVALID_SECURITY_PIN = "INVALID SECURITY PIN";
     public static final String ORDER_PIN_MANDATORY = "Security pin is mandatory";
     public static final String ORDER_STATUS_NO_VALID = "Your order is being prepared or ready and can't be canceled now";

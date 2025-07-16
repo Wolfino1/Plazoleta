@@ -220,6 +220,9 @@ public class OrderUseCase implements OrderServicePort {
         if (existingOrder.getStatus() != OrderStatus.LISTO) {
             throw new IllegalStateException(DomainConstants.ORDER_NOT_READY);
         }
+        if (existingOrder.getStatus() != OrderStatus.CANCELADO) {
+            throw new IllegalStateException(DomainConstants.ORDER_CANCELED);
+        }
 
         if (!existingOrder.getPinSecurity().equals(pinSecurity)) {
             throw new WrongArgumentException(DomainConstants.INVALID_SECURITY_PIN);
