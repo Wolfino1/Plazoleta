@@ -1,8 +1,6 @@
 package com.plazoleta.plazoleta.domain.models;
 
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
 public class OrderModel {
     private Long id;
     private Long clientId;

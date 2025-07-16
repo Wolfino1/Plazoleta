@@ -1,6 +1,5 @@
 package com.plazoleta.plazoleta.domain.usecases;
 
-
 import com.plazoleta.plazoleta.domain.exceptions.*;
 import com.plazoleta.plazoleta.domain.models.*;
 import com.plazoleta.plazoleta.domain.ports.in.OrderServicePort;
@@ -143,7 +142,7 @@ public class OrderUseCase implements OrderServicePort {
         return existing;
     }
 
-        @Override
+    @Override
     public OrderModel changeStatus(Long id, OrderModel updateStatus, String authHeader) {
         if (updateStatus.getStatus() == null) {
             throw new WrongArgumentException(DomainConstants.ORDER_STATUS_MANDATORY);
@@ -153,53 +152,53 @@ public class OrderUseCase implements OrderServicePort {
             throw new WrongArgumentException(DomainConstants.ORDER_STATUS_INVALID);
         }
 
-            Long employeeIdFromToken = jwtUtil.getEmployeeIdFromSecurityContext();
+        Long employeeIdFromToken = jwtUtil.getEmployeeIdFromSecurityContext();
 
-            OrderModel existingOrder = orderPersistencePort.getById(id);
+        OrderModel existingOrder = orderPersistencePort.getById(id);
 
-            if (existingOrder == null) {
-                throw new WrongArgumentException(DomainConstants.ORDER_NOT_FOUND);
-            }
+        if (existingOrder == null) {
+            throw new WrongArgumentException(DomainConstants.ORDER_NOT_FOUND);
+        }
 
-            if (!existingOrder.getEmployeeId().equals(employeeIdFromToken)) {
-                throw new UnauthorizedException(DomainConstants.NOT_ALLOWED_TO_EDIT_ORDERS);
-            }
+        if (!existingOrder.getEmployeeId().equals(employeeIdFromToken)) {
+            throw new UnauthorizedException(DomainConstants.NOT_ALLOWED_TO_EDIT_ORDERS);
+        }
 
-             if (existingOrder.getStatus() == OrderStatus.LISTO) {
-                return existingOrder;
-             }
-
-            if (existingOrder.getStatus() != OrderStatus.EN_PREPARACION) {
-                throw new IllegalStateException(DomainConstants.ORDER_NOT_PREPARATION);
-            }
-
-            OrderStatus previousStatus = existingOrder.getStatus(); // Guardar antes de cambiar
-
-            existingOrder.setStatus(updateStatus.getStatus());
-            orderPersistencePort.changeOrderStatus(id, existingOrder);
-
-            notificationClient.notifyOrderReady(
-                    existingOrder.getId(),
-                    existingOrder.getClientId(),
-                    existingOrder.getStatus().name(),
-                    existingOrder.getPinSecurity(),
-                    existingOrder.getPhoneNumber()
-            );
-
-            CreateTraceabilityRequest traceReq = new CreateTraceabilityRequest(
-                    existingOrder.getId(),
-                    existingOrder.getClientId(),
-                    null,
-                    LocalDateTime.now(),
-                    previousStatus,
-                    existingOrder.getStatus(),
-                    existingOrder.getEmployeeId(),
-                    null
-            );
-            traceabilityClientPort.createTrace(traceReq, authHeader);
-
+        if (existingOrder.getStatus() == OrderStatus.LISTO) {
             return existingOrder;
         }
+
+        if (existingOrder.getStatus() != OrderStatus.EN_PREPARACION) {
+            throw new IllegalStateException(DomainConstants.ORDER_NOT_PREPARATION);
+        }
+
+        OrderStatus previousStatus = existingOrder.getStatus(); // Guardar antes de cambiar
+
+        existingOrder.setStatus(updateStatus.getStatus());
+        orderPersistencePort.changeOrderStatus(id, existingOrder);
+
+        notificationClient.notifyOrderReady(
+                existingOrder.getId(),
+                existingOrder.getClientId(),
+                existingOrder.getStatus().name(),
+                existingOrder.getPinSecurity(),
+                existingOrder.getPhoneNumber()
+        );
+
+        CreateTraceabilityRequest traceReq = new CreateTraceabilityRequest(
+                existingOrder.getId(),
+                existingOrder.getClientId(),
+                null,
+                LocalDateTime.now(),
+                previousStatus,
+                existingOrder.getStatus(),
+                existingOrder.getEmployeeId(),
+                null
+        );
+        traceabilityClientPort.createTrace(traceReq, authHeader);
+
+        return existingOrder;
+    }
 
     @Override
     public OrderModel completeOrder(Long orderId, Integer pinSecurity, String authHeader) {

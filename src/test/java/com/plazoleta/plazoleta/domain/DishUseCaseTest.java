@@ -1,161 +1,143 @@
 package com.plazoleta.plazoleta.domain;
 
+import com.plazoleta.plazoleta.domain.exceptions.WrongArgumentException;
 import com.plazoleta.plazoleta.domain.models.DishModel;
+import com.plazoleta.plazoleta.domain.models.RestaurantModel;
 import com.plazoleta.plazoleta.domain.ports.out.DishPersistencePort;
 import com.plazoleta.plazoleta.domain.exceptions.UnauthorizedAccessException;
 import com.plazoleta.plazoleta.domain.ports.out.RestaurantPersistencePort;
 import com.plazoleta.plazoleta.domain.usecases.DishUseCase;
+import com.plazoleta.plazoleta.domain.util.constants.DomainConstants;
 import com.plazoleta.plazoleta.domain.util.page.PagedResult;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.util.Collections;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import java.util.Optional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.context.SecurityContext;
 
+@ExtendWith(MockitoExtension.class)
 class DishUseCaseTest {
 
-    private DishPersistencePort persistencePort;
+    @Mock
+    private DishPersistencePort dishPersistencePort;
+
+    @Mock
+    private RestaurantPersistencePort restaurantPersistencePort;
+
+    @InjectMocks
     private DishUseCase useCase;
+
+    private DishModel sampleDish;
+    private RestaurantModel sampleRestaurant;
+    private Claims claims;
+    private Authentication auth;
+    private final Long DISH_ID = 1L;
+    private final Long RESTAURANT_ID = 10L;
+    private final Long OWNER_ID = 100L;
 
     @BeforeEach
     void setUp() {
-        persistencePort = mock(DishPersistencePort.class);
-        useCase = new DishUseCase(persistencePort,);
-    }
-
-    @AfterEach
-    void tearDown() {
-        SecurityContextHolder.clearContext();
-    }
-
-    @Test
-    void save_ShouldDelegateToPersistencePort() {
-        DishModel dishModel = new DishModel("Test", 100, "Desc", "url", "Cat", 1L);
-        dishModel.setActive(true);
-        useCase.save(dishModel);
-        verify(persistencePort).save(dishModel);
-        verifyNoMoreInteractions(persistencePort);
+        sampleDish = new DishModel(DISH_ID, "Arepa", 5000, "Deliciosa arepa santandereana", "url", 2L, RESTAURANT_ID);
+        sampleRestaurant = new RestaurantModel(RESTAURANT_ID, "Sabor", "111", "dir", "+573000000000", "logo", OWNER_ID);
+        claims = mock(Claims.class);
+        when(claims.get(DomainConstants.OWNER_ID, Long.class)).thenReturn(OWNER_ID);
+        auth = mock(Authentication.class);
+        when(auth.getPrincipal()).thenReturn(claims);
+        SecurityContext context = mock(SecurityContext.class);
+        when(context.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(context);
     }
 
     @Test
-    void update_ShouldDelegateToPersistencePort() {
-        Long id = 1L;
-        DishModel updatedModel = new DishModel("Test", 100, "Desc", "url", "Cat", 1L);
-        updatedModel.setActive(false);
-        useCase.update(id, updatedModel);
-        verify(persistencePort).update(id, updatedModel);
-        verifyNoMoreInteractions(persistencePort);
+    void save_success() {
+        when(restaurantPersistencePort.findById(RESTAURANT_ID)).thenReturn(Optional.of(sampleRestaurant));
+        useCase.save(sampleDish);
+        verify(dishPersistencePort).save(sampleDish);
     }
 
     @Test
-    void updateStatus_WhenOwnerMatches_ShouldUpdateAndDelegate() {
-        Long dishId = 42L;
-        DishModel existing = new DishModel("Foo", 123, "X", "u", "c", dishId);
-        existing.setActive(true);
-        when(persistencePort.getById(dishId)).thenReturn(existing);
-
-        Claims claims = mock(Claims.class);
-        when(claims.get("ownerId", Long.class)).thenReturn(dishId);
-        Authentication auth = new UsernamePasswordAuthenticationToken(claims, null, Collections.emptyList());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        DishModel toUpdate = new DishModel("Foo", 123, "X", "u", "c", dishId);
-        toUpdate.setActive(false);
-        useCase.updateStatus(dishId, toUpdate);
-        assertThat(existing.isActive()).isFalse();
-        verify(persistencePort).updateStatus(dishId, existing);
+    void save_nonExistingRestaurant_throws() {
+        when(restaurantPersistencePort.findById(RESTAURANT_ID)).thenReturn(Optional.empty());
+        assertThrows(WrongArgumentException.class, () -> useCase.save(sampleDish));
     }
 
     @Test
-    void updateStatus_WhenOwnerMismatch_ShouldThrowUnauthorized() {
-        Long dishId = 99L;
-        DishModel existing = new DishModel("A", 1, "D", "u", "c", 100L);
-        when(persistencePort.getById(dishId)).thenReturn(existing);
-
-        Claims claims = Jwts.claims();
-        claims.put("ownerId", 101L);
-        Authentication auth = new UsernamePasswordAuthenticationToken(claims, null, Collections.emptyList());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        DishModel toUpdate = new DishModel("A", 1, "D", "u", "c", 100L);
-        toUpdate.setActive(false);
-        assertThrows(UnauthorizedAccessException.class, () -> useCase.updateStatus(dishId, toUpdate));
-        verify(persistencePort, never()).updateStatus(anyLong(), any());
+    void save_unauthorized_throws() {
+        RestaurantModel other = new RestaurantModel(RESTAURANT_ID, "X", "1", "a", "+573000000000", "logo", OWNER_ID + 1);
+        when(restaurantPersistencePort.findById(RESTAURANT_ID)).thenReturn(Optional.of(other));
+        assertThrows(UnauthorizedAccessException.class, () -> useCase.save(sampleDish));
     }
 
     @Test
-    void getDishes_ShouldDelegateToPersistencePort() {
-        Long restaurantId = 1L;
-        int page = 0;
-        int size = 5;
-        String name = "pollo";
-        Integer price = null;
-        String description = null;
-        String urlImage = null;
-        String category = null;
-        boolean active = true;
-        String sortBy = "price";
-        boolean orderAsc = false;
-
-        DishModel m1 = new DishModel(
-                "Pollo Asado",
-                20000,
-                "Tradicional pollo a la brasa",
-                "https://ejemplo.com/pollo-asado.png",
-                "Carnes",
-                restaurantId
-        );
-        DishModel m2 = new DishModel(
-                "Pollo Frito",
-                18000,
-                "Crujiente y jugoso",
-                "https://ejemplo.com/pollo-frito.png",
-                "Carnes",
-                restaurantId
-        );
-        PagedResult<DishModel> expected = new PagedResult<>(List.of(m1, m2), page, size, 2L);
-        when(persistencePort.getDishes(
-                restaurantId, page, size,
-                name, price, description, urlImage, category,
-                active, sortBy, orderAsc
-        )).thenReturn(expected);
-
-        PagedResult<DishModel> actual = useCase.getDishes(
-                restaurantId, page, size,
-                name, price, description, urlImage, category,
-                active, sortBy, orderAsc
-        );
-        verify(persistencePort).getDishes(
-                restaurantId, page, size,
-                name, price, description, urlImage, category,
-                active, sortBy, orderAsc
-        );
-        assertThat(actual).isSameAs(expected);
+    void update_success() {
+        DishModel updated = new DishModel(DISH_ID, "X", 6000, "desc2", "url", 2L, RESTAURANT_ID);
+        when(dishPersistencePort.getById(DISH_ID)).thenReturn(sampleDish);
+        when(restaurantPersistencePort.findById(RESTAURANT_ID)).thenReturn(Optional.of(sampleRestaurant));
+        useCase.update(DISH_ID, updated);
+        assertEquals(6000, sampleDish.getPrice());
+        assertEquals("desc2", sampleDish.getDescription());
+        verify(dishPersistencePort).update(DISH_ID, sampleDish);
     }
 
     @Test
-    void getDishes_WhenPersistencePortThrows_ShouldPropagate() {
-        when(persistencePort.getDishes(
-                anyLong(), anyInt(), anyInt(),
-                any(), any(), any(), any(), any(),
-                anyBoolean(), any(), anyBoolean()
-        )).thenThrow(new RuntimeException("DB caído"));
+    void update_notFound_throws() {
+        when(dishPersistencePort.getById(DISH_ID)).thenReturn(null);
+        assertThrows(WrongArgumentException.class, () -> useCase.update(DISH_ID, sampleDish));
+    }
 
-        assertThrows(
-                RuntimeException.class,
-                () -> useCase.getDishes(1L, 0, 10, null, null, null, null, null, true, "name", true)
-        );
+    @Test
+    void update_nonExistingRestaurant_throws() {
+        when(dishPersistencePort.getById(DISH_ID)).thenReturn(sampleDish);
+        when(restaurantPersistencePort.findById(RESTAURANT_ID)).thenReturn(Optional.empty());
+        assertThrows(WrongArgumentException.class, () -> useCase.update(DISH_ID, sampleDish));
+    }
+
+    @Test
+    void update_unauthorized_throws() {
+        when(dishPersistencePort.getById(DISH_ID)).thenReturn(sampleDish);
+        RestaurantModel other = new RestaurantModel(RESTAURANT_ID, "X", "1", "a", "+573000000000", "logo", OWNER_ID + 1);
+        when(restaurantPersistencePort.findById(RESTAURANT_ID)).thenReturn(Optional.of(other));
+        assertThrows(UnauthorizedAccessException.class, () -> useCase.update(DISH_ID, sampleDish));
+    }
+
+    @Test
+    void updateStatus_success() {
+        DishModel newStatus = new DishModel();
+        newStatus.setActive(false);
+        when(dishPersistencePort.getById(DISH_ID)).thenReturn(sampleDish);
+        when(restaurantPersistencePort.findById(RESTAURANT_ID)).thenReturn(Optional.of(sampleRestaurant));
+        useCase.updateStatus(DISH_ID, newStatus);
+        assertFalse(sampleDish.isActive());
+        verify(dishPersistencePort).updateStatus(DISH_ID, sampleDish);
+    }
+
+    @Test
+    void updateStatus_notFound_throws() {
+        when(dishPersistencePort.getById(DISH_ID)).thenReturn(null);
+        assertThrows(WrongArgumentException.class, () -> useCase.updateStatus(DISH_ID, sampleDish));
+    }
+
+    @Test
+    void updateStatus_nonExistingRestaurant_throws() {
+        when(dishPersistencePort.getById(DISH_ID)).thenReturn(sampleDish);
+        when(restaurantPersistencePort.findById(RESTAURANT_ID)).thenReturn(Optional.empty());
+        assertThrows(WrongArgumentException.class, () -> useCase.updateStatus(DISH_ID, sampleDish));
+    }
+
+    @Test
+    void updateStatus_unauthorized_throws() {
+        when(dishPersistencePort.getById(DISH_ID)).thenReturn(sampleDish);
+        RestaurantModel other = new RestaurantModel(RESTAURANT_ID, "X", "1", "a", "+573000000000", "logo", OWNER_ID + 1);
+        when(restaurantPersistencePort.findById(RESTAURANT_ID)).thenReturn(Optional.of(other));
+        assertThrows(UnauthorizedAccessException.class, () -> useCase.updateStatus(DISH_ID, sampleDish));
     }
 }
-

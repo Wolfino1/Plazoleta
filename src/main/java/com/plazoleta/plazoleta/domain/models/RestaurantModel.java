@@ -112,5 +112,3 @@ public class RestaurantModel {
         this.ownerId = ownerId;
     }
 }
-
-

@@ -15,87 +15,84 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.*;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 @ExtendWith(MockitoExtension.class)
 class RestaurantUseCaseTest {
 
     @Mock
-    private RestaurantPersistencePort persistencePort;
+    private RestaurantPersistencePort restaurantPersistencePort;
 
+    @InjectMocks
     private RestaurantUseCase useCase;
 
-    @BeforeEach
-    void setUp() {
-        useCase = new RestaurantUseCase(persistencePort);
-    }
+    private RestaurantModel sampleModel;
+    private final Long SAMPLE_ID = 1L;
 
-    @Test
-    void save_shouldDelegateToPersistencePort() {
-        RestaurantModel model = new RestaurantModel(
-                1L,
-                "Prueba Restaurantes",
-                "123456789",
-                "Calle Falsa 123",
-                "+571234567890",
-                "https://logo.test/img.png",
+    @BeforeEach
+    void setup() {
+        sampleModel = new RestaurantModel(
+                SAMPLE_ID,
+                "Sabor Santandereano",
+                "900987654",
+                "Carrera 27 #36-10, Bucaramanga",
+                "+573227654321",
+                "https://cdn.ejemplo.com/logos/sabor-santandereano.png",
                 1L
         );
-
-        useCase.save(model);
-
-        verify(persistencePort).save(model);
-        verifyNoMoreInteractions(persistencePort);
     }
 
     @Test
-    void save_withNullModel_shouldDelegateNullToPersistencePort() {
-        useCase.save(null);
-
-        verify(persistencePort).save(null);
-        verifyNoMoreInteractions(persistencePort);
+    void save_callsPersistenceSave() {
+        useCase.save(sampleModel);
+        verify(restaurantPersistencePort, times(1)).save(sampleModel);
     }
+
     @Test
-    void whenGetRestaurants_thenDelegatesToPersistencePort() {
-        int page = 0;
-        int size = 5;
-        String name = "Testaurant";
-        String logoUrl = "https://logo.test/img.png";
+    void getRestaurants_delegatesAllParameters() {
+        Integer page = 0;
+        Integer size = 5;
+        Long id = 2L;
+        String name = "Foo";
+        Long ownerId = 3L;
+        String logoUrl = "logo.png";
         String sortBy = "name";
-        boolean orderAsc = true;
+        boolean orderAsc = false;
 
-        RestaurantModel r1 = new RestaurantModel(
-                1L,
-                "Rest A",
-                "11111111",
-                "Addr A",
-                "+5700000001",
-                "https://logo.test/a.png",
-                10L
-        );
-        RestaurantModel r2 = new RestaurantModel(
-                2L,
-                "Rest B",
-                "22222222",
-                "Addr B",
-                "+5700000002",
-                "https://logo.test/b.png",
-                20L
-        );
-
-        PagedResult<RestaurantModel> expected = new PagedResult<>(
-                List.of(r1, r2),
-                page,
-                size,
-                2L
-        );
-        when(persistencePort.getRestaurants(page, size, name, logoUrl, sortBy, orderAsc))
+        PagedResult<RestaurantModel> expected = mock(PagedResult.class);
+        when(restaurantPersistencePort.getRestaurants(page, size, id, name, ownerId, logoUrl, sortBy, orderAsc))
                 .thenReturn(expected);
 
-        PagedResult<RestaurantModel> actual = useCase.getRestaurants(
-                page, size, name, logoUrl, sortBy, orderAsc
-        );
+        PagedResult<RestaurantModel> actual = useCase.getRestaurants(page, size, id, name, ownerId, logoUrl, sortBy, orderAsc);
 
-        verify(persistencePort).getRestaurants(page, size, name, logoUrl, sortBy, orderAsc);
         assertSame(expected, actual);
     }
 
+    @Test
+    void getRestaurantById_nullId_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> useCase.getRestaurantById(null));
+    }
+
+    @Test
+    void getRestaurantById_notFound_throwsRuntimeException() {
+        when(restaurantPersistencePort.getUserById(SAMPLE_ID)).thenReturn(null);
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> useCase.getRestaurantById(SAMPLE_ID));
+        assertTrue(ex.getMessage().contains(SAMPLE_ID.toString()));
+    }
+
+    @Test
+    void getRestaurantById_found_returnsModel() {
+        when(restaurantPersistencePort.getUserById(SAMPLE_ID)).thenReturn(sampleModel);
+        RestaurantModel actual = useCase.getRestaurantById(SAMPLE_ID);
+        assertEquals(sampleModel, actual);
+    }
 }
+
